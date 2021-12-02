@@ -10,6 +10,11 @@ mod test_puzzles {
     fn part1() {
         assert_eq!(1162, super::part1());
     }
+
+    #[test]
+    fn part2() {
+        assert_eq!(1190, super::part2());
+    }
 }
 
 #[cfg(test)]
@@ -199,19 +204,37 @@ fn part1() -> u32 {
     let mut input: Vec<u32> = Vec::new();
 
     // Read test data in, iterate over each line.
-    let f = File::open("data/day1_part1.txt").expect("Could not open data/day1_part1.txt");
+    let f = File::open("data/day1.txt").expect("Could not open data/day1.txt");
     let reader = BufReader::new(f);
 
     for line in reader.lines() {
-        let line = line.expect("Invalid line in data/day1_part1.txt");
+        let line = line.expect("Invalid line in data/day1.txt");
 
-        let n: u32 = line.trim().parse().expect("Non-number in data/day1_part1.txt");
+        let n: u32 = line.trim().parse().expect("Non-number in data/day1.txt");
         input.push(n);
     }
 
     return num_increases(&input);
 }
 
+fn part2() -> u32 {
+    let mut input: Vec<u32> = Vec::new();
+
+    // Read test data in, iterate over each line.
+    let f = File::open("data/day1.txt").expect("Could not open data/day1.txt");
+    let reader = BufReader::new(f);
+
+    for line in reader.lines() {
+        let line = line.expect("Invalid line in data/day1.txt");
+
+        let n: u32 = line.trim().parse().expect("Non-number in data/day1.txt");
+        input.push(n);
+    }
+
+    return num_increases_sliding_window(&input);
+}
+
 fn main() {
     println!("Part 1: The number of depth increases is {}", part1());
+    println!("Part 2: The number of sliding window sum increases is {}", part2());
 }
