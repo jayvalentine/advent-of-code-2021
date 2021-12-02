@@ -1,6 +1,17 @@
 // Advent of Code 2021
 // Day 1
 
+use std::fs::File;
+use std::io::{prelude::*, BufReader};
+
+#[cfg(test)]
+mod test_puzzles {
+    #[test]
+    fn part1() {
+        assert_eq!(1162, super::part1());
+    }
+}
+
 #[cfg(test)]
 mod test_examples {
     use super::*;
@@ -95,6 +106,23 @@ fn num_increases(report: &[u32]) -> u32 {
     return increases;
 }
 
-fn main() {
+fn part1() -> u32 {
+    let mut input: Vec<u32> = Vec::new();
 
+    // Read test data in, iterate over each line.
+    let f = File::open("data/day1_part1.txt").expect("Could not open data/day1_part1.txt");
+    let reader = BufReader::new(f);
+
+    for line in reader.lines() {
+        let line = line.expect("Invalid line in data/day1_part1.txt");
+
+        let n: u32 = line.trim().parse().expect("Non-number in data/day1_part1.txt");
+        input.push(n);
+    }
+
+    return num_increases(&input);
+}
+
+fn main() {
+    println!("Part 1: The number of depth increases is {}", part1());
 }
