@@ -1,8 +1,7 @@
 // Advent of Code 2021
 // Day 1
 
-use std::fs::File;
-use std::io::{prelude::*, BufReader};
+use aoc::data;
 
 #[cfg(test)]
 mod test_puzzles {
@@ -201,35 +200,13 @@ fn num_increases_sliding_window(report: &[u32]) -> u32 {
 }
 
 fn part1() -> u32 {
-    let mut input: Vec<u32> = Vec::new();
-
-    // Read test data in, iterate over each line.
-    let f = File::open("data/day1.txt").expect("Could not open data/day1.txt");
-    let reader = BufReader::new(f);
-
-    for line in reader.lines() {
-        let line = line.expect("Invalid line in data/day1.txt");
-
-        let n: u32 = line.trim().parse().expect("Non-number in data/day1.txt");
-        input.push(n);
-    }
+    let input = data::get("data/day1.txt");
 
     return num_increases(&input);
 }
 
 fn part2() -> u32 {
-    let mut input: Vec<u32> = Vec::new();
-
-    // Read test data in, iterate over each line.
-    let f = File::open("data/day1.txt").expect("Could not open data/day1.txt");
-    let reader = BufReader::new(f);
-
-    for line in reader.lines() {
-        let line = line.expect("Invalid line in data/day1.txt");
-
-        let n: u32 = line.trim().parse().expect("Non-number in data/day1.txt");
-        input.push(n);
-    }
+    let input = data::get("data/day1.txt");
 
     return num_increases_sliding_window(&input);
 }
