@@ -13,6 +13,14 @@ mod test_puzzles {
         assert_eq!(916, pos.depth);
         assert_eq!(1970, pos.horizontal);
     }
+
+    #[test]
+    fn part2() {
+        let pos = super::part2();
+
+        assert_eq!(1000556, pos.depth);
+        assert_eq!(1970, pos.horizontal);
+    }
 }
 
 #[cfg(test)]
@@ -64,6 +72,7 @@ mod test_examples {
     }
 }
 
+#[cfg(test)]
 mod test_do_commands {
     use super::*;
 
@@ -118,6 +127,7 @@ mod test_do_commands {
     }
 }
 
+#[cfg(test)]
 mod test_do_commands_with_aim {
     use super::*;
 
@@ -282,8 +292,18 @@ fn part1() -> Position {
     return final_position(&commands);
 }
 
+fn part2() -> Position {
+    let commands: Vec<Command> = data::get("data/day2.txt");
+
+    return final_position_with_aim(&commands);
+}
+
 fn main() {
     let final_pos = part1();
     let product = final_pos.depth * final_pos.horizontal;
-    println!("Final position is (d{}, h{}) (product {})", final_pos.depth, final_pos.horizontal, product);
+    println!("Part 1: Final position is (d{}, h{}) (product {})", final_pos.depth, final_pos.horizontal, product);
+
+    let final_pos = part2();
+    let product = final_pos.depth * final_pos.horizontal;
+    println!("Part 2: Final position is (d{}, h{}) (product {})", final_pos.depth, final_pos.horizontal, product);
 }
