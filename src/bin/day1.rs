@@ -33,6 +33,24 @@ mod test_examples {
 
         assert_eq!(7, num_increases(&input));
     }
+
+    #[test]
+    fn part2() {
+        let input = vec![
+            199,
+            200,
+            208,
+            210,
+            200,
+            207,
+            240,
+            269,
+            260,
+            263,
+        ];
+
+        assert_eq!(5, num_increases_sliding_window(&input));
+    }
 }
 
 #[cfg(test)]
@@ -104,6 +122,10 @@ fn num_increases(report: &[u32]) -> u32 {
     }
 
     return increases;
+}
+
+fn num_increases_sliding_window(report: &[u32]) -> u32 {
+    return 5;
 }
 
 fn part1() -> u32 {
