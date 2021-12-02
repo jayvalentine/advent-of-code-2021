@@ -54,7 +54,7 @@ mod test_examples {
 }
 
 #[cfg(test)]
-mod test_num_decreases {
+mod test_num_increases {
     use super::*;
 
     #[test]
@@ -112,6 +112,65 @@ mod test_num_decreases {
     }
 }
 
+#[cfg(test)]
+mod test_num_increases_sliding_window {
+    use super::*;
+
+    #[test]
+    fn all_increases() {
+        let input = vec![
+            1,
+            2,
+            3, // 6
+            4, // 9
+            5  // 12
+        ];
+
+        assert_eq!(2, num_increases_sliding_window(&input));
+    }
+
+    #[test]
+    fn all_same() {
+        let input = vec![
+            101,
+            101,
+            101,
+            101,
+            101
+        ];
+
+        assert_eq!(0, num_increases_sliding_window(&input));
+    }
+
+    #[test]
+    fn all_decreases() {
+        let input = vec![
+            101,
+            100,
+            98,
+            90,
+            40
+        ];
+
+        assert_eq!(0, num_increases_sliding_window(&input));
+    }
+
+    #[test]
+    fn up_and_down() {
+        let input = vec![
+            100,
+            100,
+            100, // 300
+            50,  // 250
+            200, // 350
+            10,  // 260
+            100  // 310
+        ];
+
+        assert_eq!(2, num_increases_sliding_window(&input));
+    }
+}
+
 fn num_increases(report: &[u32]) -> u32 {
     let mut previous = u32::MAX;
     let mut increases = 0;
@@ -125,7 +184,15 @@ fn num_increases(report: &[u32]) -> u32 {
 }
 
 fn num_increases_sliding_window(report: &[u32]) -> u32 {
-    return 5;
+    let mut sums: Vec<u32> = Vec::new();
+
+    for i in 2..report.len() {
+        let range = &report[i-2..i+1];
+        let sum = range.iter().fold(0, |acc, x| acc + x);
+        sums.push(sum);
+    }
+
+    return num_increases(&sums);
 }
 
 fn part1() -> u32 {
