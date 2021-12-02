@@ -40,6 +40,28 @@ mod test_examples {
         assert_eq!(10, position.depth);
         assert_eq!(15, position.horizontal);
     }
+
+    #[test]
+    fn part2() {
+        let input = vec![
+            "forward 5",
+            "down 5",
+            "forward 8",
+            "up 3",
+            "down 8",
+            "forward 2"
+        ];
+
+        let mut commands: Vec<Command> = Vec::new();
+        for s in input {
+            commands.push(Command::from_str(&s).expect("Could not parse command!"));
+        }
+
+        let position = final_position_with_aim(&commands);
+
+        assert_eq!(60, position.depth);
+        assert_eq!(15, position.horizontal);
+    }
 }
 
 mod test_do_commands {
@@ -96,10 +118,69 @@ mod test_do_commands {
     }
 }
 
+mod test_do_commands_with_aim {
+    use super::*;
+
+    #[test]
+    fn forward() {
+        let commands = vec![
+            Command { dir: Direction::Forward, val: 5 }
+        ];
+
+        let position = final_position_with_aim(&commands);
+
+        assert_eq!(0, position.aim);
+        assert_eq!(0, position.depth);
+        assert_eq!(5, position.horizontal);
+    }
+
+    #[test]
+    fn down() {
+        let commands = vec![
+            Command { dir: Direction::Down, val: 19 }
+        ];
+
+        let position = final_position_with_aim(&commands);
+
+        assert_eq!(19, position.aim);
+        assert_eq!(0, position.depth);
+        assert_eq!(0, position.horizontal);
+    }
+
+    #[test]
+    fn down_up() {
+        let commands = vec![
+            Command { dir: Direction::Down, val: 19 },
+            Command { dir: Direction::Up, val: 4 }
+        ];
+
+        let position = final_position_with_aim(&commands);
+
+        assert_eq!(15, position.aim);
+        assert_eq!(0, position.depth);
+        assert_eq!(0, position.horizontal);
+    }
+
+    #[test]
+    fn down_forward() {
+        let commands = vec![
+            Command { dir: Direction::Down, val: 6 },
+            Command { dir: Direction::Forward, val: 6 }
+        ];
+
+        let position = final_position_with_aim(&commands);
+
+        assert_eq!(6, position.aim);
+        assert_eq!(36, position.depth);
+        assert_eq!(6, position.horizontal);
+    }
+}
+
 // A position in terms of depth and horizontal.
 struct Position {
     depth: u32,
-    horizontal: u32
+    horizontal: u32,
+    aim: u32
 }
 
 // A direction in which the submarine can travel.
@@ -165,13 +246,30 @@ impl FromStr for Command {
 }
 
 fn final_position(commands: &[Command]) -> Position {
-    let mut pos = Position { depth: 0, horizontal: 0 };
+    let mut pos = Position { depth: 0, horizontal: 0, aim: 0 };
 
     for command in commands {
         match command.dir {
             Direction::Down => pos.depth += command.val,
             Direction::Up => pos.depth -= command.val,
             Direction::Forward => pos.horizontal += command.val
+        };
+    }
+
+    return pos;
+}
+
+fn final_position_with_aim(commands: &[Command]) -> Position {
+    let mut pos = Position { depth: 0, horizontal: 0, aim: 0 };
+
+    for command in commands {
+        match command.dir {
+            Direction::Down => pos.aim += command.val,
+            Direction::Up => pos.aim -= command.val,
+            Direction::Forward => {
+                pos.horizontal += command.val;
+                pos.depth += pos.aim * command.val;
+            }
         };
     }
 
