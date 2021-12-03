@@ -88,8 +88,48 @@ struct Rates {
     epsilon: u32
 }
 
-fn find_rates(input: &[u32], width: u32) -> Rates {
-    return Rates { gamma: 22, epsilon: 9 }
+fn find_rates(input: &[u32], width: usize) -> Rates {
+    let mut count_ones: Vec<u32> = vec![0; width];
+    let mut count_zeros: Vec<u32> = vec![0; width];
+
+    // Find most common bits in each position.
+    for i in input {
+        let mut mask = 1;
+        for w in 0..width {
+            if i & mask == mask {
+                count_ones[w] += 1;
+            }
+            else {
+                count_zeros[w] += 1;
+            }
+
+            mask <<= 1;
+        }
+    }
+
+    // Calculate gamma.
+    let mut gamma = 0;
+    for w in (0..width).rev() {
+        gamma <<= 1;
+        if count_ones[w] > count_zeros[w] {
+            gamma |= 1;
+        }
+    }
+
+    // Epsilon is just gamma but NOTed,
+    // truncated to width.
+    let epsilon = !gamma;
+
+    // Generate a mask to truncate epsilon.
+    let mut mask = 0;
+    for _ in 0..width {
+        mask <<= 1;
+        mask |= 1;
+    }
+
+    let epsilon = epsilon & mask;
+
+    return Rates { gamma, epsilon }
 }
 
 fn main() {
