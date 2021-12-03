@@ -1,6 +1,8 @@
 // Advent of Code 2021
 // Day 3
 
+use aoc::data;
+
 #[cfg(test)]
 mod test_examples {
     use super::*;
@@ -132,6 +134,13 @@ fn find_rates(input: &[u32], width: usize) -> Rates {
     return Rates { gamma, epsilon }
 }
 
-fn main() {
+fn part1() -> Rates {
+    let input = data::get_bin("data/day3.txt");
+    return find_rates(&input, 12);
+}
 
+fn main() {
+    let rates = part1();
+    let power = rates.gamma * rates.epsilon;
+    println!("Gamma: {}, Epsilon: {} (Power Consumption {})", rates.gamma, rates.epsilon, power);
 }
