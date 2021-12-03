@@ -4,6 +4,25 @@
 use aoc::data;
 
 #[cfg(test)]
+mod test_puzzles {
+    #[test]
+    fn part1() {
+        let rates = super::part1();
+
+        assert_eq!(1816, rates.gamma);
+        assert_eq!(2279, rates.epsilon)
+    }
+
+    #[test]
+    fn part2() {
+        let rates = super::part2();
+
+        assert_eq!(2031, rates.oxygen);
+        assert_eq!(2104, rates.co2)
+    }
+}
+
+#[cfg(test)]
 mod test_examples {
     use super::*;
 
@@ -238,8 +257,17 @@ fn part1() -> Rates {
     return find_rates(&input, 12);
 }
 
+fn part2() -> LifeSupportRates {
+    let input = data::get_bin("data/day3.txt");
+    return find_rates_life_support(&input, 12);
+}
+
 fn main() {
     let rates = part1();
     let power = rates.gamma * rates.epsilon;
     println!("Gamma: {}, Epsilon: {} (Power Consumption {})", rates.gamma, rates.epsilon, power);
+
+    let rates = part2();
+    let power = rates.oxygen * rates.co2;
+    println!("Gamma: {}, Epsilon: {} (Power Consumption {})", rates.oxygen, rates.co2, power);
 }
