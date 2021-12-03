@@ -29,6 +29,29 @@ mod test_examples {
         assert_eq!(22, rates.gamma);
         assert_eq!(9, rates.epsilon);
     }
+
+    #[test]
+    fn part2() {
+        let input = vec![
+            0b00100,
+            0b11110,
+            0b10110,
+            0b10111,
+            0b10101,
+            0b01111,
+            0b00111,
+            0b11100,
+            0b10000,
+            0b11001,
+            0b00010,
+            0b01010
+        ];
+
+        let rates = find_rates_life_support(&input, 5);
+
+        assert_eq!(23, rates.oxygen);
+        assert_eq!(10, rates.co2);
+    }
 }
 
 #[cfg(test)]
@@ -90,7 +113,12 @@ struct Rates {
     epsilon: u32
 }
 
-fn find_rates(input: &[u32], width: usize) -> Rates {
+struct LifeSupportRates {
+    oxygen: u32,
+    co2: u32
+}
+
+fn most_common(input: &[u32], width: usize) -> (Vec<u32>, Vec<u32>) {
     let mut count_ones: Vec<u32> = vec![0; width];
     let mut count_zeros: Vec<u32> = vec![0; width];
 
@@ -108,6 +136,12 @@ fn find_rates(input: &[u32], width: usize) -> Rates {
             mask <<= 1;
         }
     }
+
+    return (count_ones, count_zeros);
+}
+
+fn find_rates(input: &[u32], width: usize) -> Rates {
+    let (count_ones, count_zeros) = most_common(input, width);
 
     // Calculate gamma.
     let mut gamma = 0;
@@ -132,6 +166,42 @@ fn find_rates(input: &[u32], width: usize) -> Rates {
     let epsilon = epsilon & mask;
 
     return Rates { gamma, epsilon }
+}
+
+fn find_rates_life_support(input: &[u32], width: usize) -> LifeSupportRates {
+    let oxygen = find_rates_oxygen(input, width);
+    let co2 = 0;
+
+    return LifeSupportRates { oxygen, co2 };
+}
+
+fn find_rates_oxygen(input: &[u32], width: usize) -> u32 {
+    let (count_ones, count_zeros) = most_common(input, width);
+
+    let mut selected = Vec::new();
+
+    let w = width - 1;
+
+    for i in input {
+        if count_ones[w] >= count_zeros[w] {
+            let mask = 1 << w;
+            if i & mask == mask {
+                selected.push(*i);
+            }
+        }
+        else {
+            let mask = !(1 << w);
+            if i | mask == mask {
+                selected.push(*i)
+            }
+        }
+    }
+
+    if selected.len() == 1 {
+        return selected[0];
+    }
+
+    return find_rates_oxygen(&selected, width-1);
 }
 
 fn part1() -> Rates {
