@@ -170,7 +170,7 @@ fn find_rates(input: &[u32], width: usize) -> Rates {
 
 fn find_rates_life_support(input: &[u32], width: usize) -> LifeSupportRates {
     let oxygen = find_rates_oxygen(input, width);
-    let co2 = 0;
+    let co2 = find_rates_co2(input, width);
 
     return LifeSupportRates { oxygen, co2 };
 }
@@ -202,6 +202,35 @@ fn find_rates_oxygen(input: &[u32], width: usize) -> u32 {
     }
 
     return find_rates_oxygen(&selected, width-1);
+}
+
+fn find_rates_co2(input: &[u32], width: usize) -> u32 {
+    let (count_ones, count_zeros) = most_common(input, width);
+
+    let mut selected = Vec::new();
+
+    let w = width - 1;
+
+    for i in input {
+        if count_ones[w] < count_zeros[w] {
+            let mask = 1 << w;
+            if i & mask == mask {
+                selected.push(*i);
+            }
+        }
+        else {
+            let mask = !(1 << w);
+            if i | mask == mask {
+                selected.push(*i)
+            }
+        }
+    }
+
+    if selected.len() == 1 {
+        return selected[0];
+    }
+
+    return find_rates_co2(&selected, width-1);
 }
 
 fn part1() -> Rates {
