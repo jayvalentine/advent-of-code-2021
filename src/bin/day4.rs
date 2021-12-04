@@ -4,6 +4,9 @@
 use core::iter::{FromIterator, Iterator};
 use std::slice::Iter;
 
+use std::fs::File;
+use std::io::{prelude::*, BufReader};
+
 #[cfg(test)]
 mod test_examples {
     use super::*;
@@ -119,7 +122,8 @@ mod test_parse_board {
         assert_eq!(10, board.cell(4, 2));
         assert_eq!(38, board.cell(4, 3));
         assert_eq!(45, board.cell(4, 4));
-    }
+    }use std::fs::File;
+    use std::io::{prelude::*, BufReader};
 }
 
 #[cfg(test)]
@@ -321,6 +325,36 @@ fn play_bingo(calls: &[u32], boards: &mut [BingoBoard]) -> u32 {
     panic!("Nobody won bingo!");
 }
 
-fn main() {
+fn part1() -> u32 {
+    let file = "data/day4.txt";
 
+    // Read test data in, iterate over each line.
+    let f = File::open(file).expect(&format!("Could not open {}", file));
+    let reader = BufReader::new(f);
+
+    let mut lines = Vec::new();
+    for line in reader.lines() {
+        let line_str = line.expect("Invalid line in file!");
+
+        lines.push(line_str);
+    }
+
+    let lines: Vec<&str> = lines.iter().map(|x| x.as_str()).collect();
+
+    let mut lines_iter = lines.iter();
+
+    let calls = parse_calls(&mut lines_iter);
+    let mut boards = Vec::new();
+
+    while lines_iter.len() > 0 {
+        boards.push(BingoBoard::parse(&mut lines_iter));
+    }
+
+    let score = play_bingo(&calls, &mut boards);
+    return score;
+}
+
+fn main() {
+    let score = part1();
+    println!("Part 1: Score is {}", score);
 }
