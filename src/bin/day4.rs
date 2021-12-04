@@ -122,9 +122,99 @@ mod test_parse_board {
     }
 }
 
+#[cfg(test)]
+mod test_board {
+    use super::*;
+
+    #[test]
+    fn mark_number() {
+        let mut board = BingoBoard {
+            grid: [
+                [1, 2, 3, 4, 5],
+                [44, 33, 22, 11, 55],
+                [99, 98, 97, 96, 95],
+                [12, 13, 14, 15, 16],
+                [10, 9, 8, 7, 6]
+            ],
+
+            marks: [[false; 5]; 5]
+        };
+
+        board.call(22);
+
+        assert_eq!(true, board.marks[1][2]);
+        assert_eq!(false, board.marks[0][0]);
+        assert_eq!(false, board.marks[2][1]);
+        assert_eq!(false, board.marks[1][3]);
+    }
+
+    #[test]
+    fn bingo_row() {
+        let mut board = BingoBoard {
+            grid: [
+                [1, 2, 3, 4, 5],
+                [44, 33, 22, 11, 55],
+                [99, 98, 97, 96, 95],
+                [12, 13, 14, 15, 16],
+                [10, 9, 8, 7, 6]
+            ],
+
+            marks: [[false; 5]; 5]
+        };
+
+        board.call(22);
+        assert_eq!(false, board.bingo());
+
+        board.call(33);
+        assert_eq!(false, board.bingo());
+
+        board.call(55);
+        assert_eq!(false, board.bingo());
+
+        board.call(11);
+        assert_eq!(false, board.bingo());
+
+        board.call(44);
+        assert_eq!(true, board.bingo());
+    }
+
+    #[test]
+    fn bingo_col() {
+        let mut board = BingoBoard {
+            grid: [
+                [1, 2, 3, 4, 5],
+                [44, 33, 22, 11, 55],
+                [99, 98, 97, 96, 95],
+                [12, 13, 14, 15, 16],
+                [10, 9, 8, 7, 6]
+            ],
+
+            marks: [[false; 5]; 5]
+        };
+
+        board.call(1);
+        assert_eq!(false, board.bingo());
+
+        board.call(99);
+        assert_eq!(false, board.bingo());
+
+        board.call(12);
+        assert_eq!(false, board.bingo());
+
+        board.call(44);
+        assert_eq!(false, board.bingo());
+
+        board.call(10);
+        assert_eq!(true, board.bingo());
+    }
+}
+
 struct BingoBoard {
     // 2D grid, row-major.
-    grid: [[u32; 5]; 5]
+    grid: [[u32; 5]; 5],
+
+    // Indicates which squares are marked.
+    marks: [[bool; 5]; 5]
 }
 
 impl BingoBoard {
@@ -142,11 +232,52 @@ impl BingoBoard {
             }
         }
 
-        return BingoBoard { grid }
+        return BingoBoard { grid, marks: [[false; 5]; 5] }
     }
 
     fn cell(&self, x: usize, y: usize) -> u32 {
         return self.grid[y][x];
+    }
+
+    fn call(&mut self, n: u32) {
+        for y in 0..5 {
+            for x in 0..5 {
+                if self.grid[y][x] == n {
+                    self.marks[y][x] = true;
+                    return;
+                }
+            }
+        }
+    }
+
+    fn bingo(&self) -> bool {
+        for y in 0..5 {
+            let mut row_done = true;
+            for x in 0..5 {
+                if !self.marks[y][x] {
+                    row_done = false;
+                }
+            }
+
+            if row_done {
+                return true;
+            }
+        }
+
+        for x in 0..5 {
+            let mut col_done = true;
+            for y in 0..5 {
+                if !self.marks[y][x] {
+                    col_done = false;
+                }
+            }
+
+            if col_done {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 
