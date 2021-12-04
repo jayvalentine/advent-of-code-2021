@@ -194,7 +194,7 @@ fn find_rates_life_support(input: &[u32], width: usize) -> LifeSupportRates {
     return LifeSupportRates { oxygen, co2 };
 }
 
-fn find_rates_oxygen(input: &[u32], width: usize) -> u32 {
+fn find_rates_with_closure(input: &[u32], width: usize, f: &dyn Fn(u32, u32) -> bool) -> u32 {
     let (count_ones, count_zeros) = most_common(input, width);
 
     let mut selected = Vec::new();
@@ -202,7 +202,7 @@ fn find_rates_oxygen(input: &[u32], width: usize) -> u32 {
     let w = width - 1;
 
     for i in input {
-        if count_ones[w] >= count_zeros[w] {
+        if f(count_ones[w], count_zeros[w]) {
             let mask = 1 << w;
             if i & mask == mask {
                 selected.push(*i);
@@ -220,36 +220,15 @@ fn find_rates_oxygen(input: &[u32], width: usize) -> u32 {
         return selected[0];
     }
 
-    return find_rates_oxygen(&selected, width-1);
+    return find_rates_with_closure(&selected, width-1, f);
+}
+
+fn find_rates_oxygen(input: &[u32], width: usize) -> u32 {
+    return find_rates_with_closure(input, width, &|x, y| x >= y);
 }
 
 fn find_rates_co2(input: &[u32], width: usize) -> u32 {
-    let (count_ones, count_zeros) = most_common(input, width);
-
-    let mut selected = Vec::new();
-
-    let w = width - 1;
-
-    for i in input {
-        if count_ones[w] < count_zeros[w] {
-            let mask = 1 << w;
-            if i & mask == mask {
-                selected.push(*i);
-            }
-        }
-        else {
-            let mask = !(1 << w);
-            if i | mask == mask {
-                selected.push(*i)
-            }
-        }
-    }
-
-    if selected.len() == 1 {
-        return selected[0];
-    }
-
-    return find_rates_co2(&selected, width-1);
+    return find_rates_with_closure(input, width, &|x, y| x < y);
 }
 
 fn part1() -> Rates {
