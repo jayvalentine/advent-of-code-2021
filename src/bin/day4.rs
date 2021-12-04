@@ -1,11 +1,26 @@
 // Advent of Code 2021
 // Day 4
 
-use core::iter::{FromIterator, Iterator};
+use core::iter::Iterator;
 use std::slice::Iter;
 
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
+
+#[cfg(test)]
+mod test_puzzles {
+    #[test]
+    fn part1() {
+        let score = super::part1();
+        assert_eq!(35670, score);
+    }
+
+    #[test]
+    fn part2() {
+        let score = super::part2();
+        assert_eq!(22704, score);
+    }
+}
 
 #[cfg(test)]
 mod test_examples {
@@ -40,13 +55,51 @@ mod test_examples {
         let calls = parse_calls(&mut input_iter);
 
         let mut boards = Vec::new();
-        for i in 0..3 {
+        for _ in 0..3 {
             boards.push(BingoBoard::parse(&mut input_iter))
         }
 
         let score = play_bingo(&calls, &mut boards);
 
         assert_eq!(4512, score);
+    }
+
+    #[test]
+    fn part2() {
+        let input = vec![
+            "7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1",
+            "",
+            "22 13 17 11  0",
+            "8  2 23  4 24",
+            "21  9 14 16  7",
+            "6 10  3 18  5",
+            "1 12 20 15 19",
+            "",
+            "3 15  0  2 22",
+            "9 18 13 17  5",
+            "19  8  7 25 23",
+            "20 11 10 24  4",
+            "14 21 16 12  6",
+            "",
+            "14 21 17 24  4",
+            "10 16 15  9 19",
+            "18  8 23 26 20",
+            "22 11 13  6  5",
+            "2  0 12  3  7",
+        ];
+
+        let mut input_iter = input.iter();
+
+        let calls = parse_calls(&mut input_iter);
+
+        let mut boards = Vec::new();
+        for _ in 0..3 {
+            boards.push(BingoBoard::parse(&mut input_iter))
+        }
+
+        let score = play_bingo_last_winner(&calls, &mut boards);
+
+        assert_eq!(1924, score);
     }
 }
 
@@ -122,8 +175,7 @@ mod test_parse_board {
         assert_eq!(10, board.cell(4, 2));
         assert_eq!(38, board.cell(4, 3));
         assert_eq!(45, board.cell(4, 4));
-    }use std::fs::File;
-    use std::io::{prelude::*, BufReader};
+    }
 }
 
 #[cfg(test)]
@@ -250,7 +302,7 @@ impl BingoBoard {
     fn call(&mut self, n: u32) {
         for y in 0..5 {
             for x in 0..5 {
-                if self.grid[y][x] == n {
+                if self.cell(x, y) == n {
                     self.marks[y][x] = true;
                     return;
                 }
@@ -325,7 +377,35 @@ fn play_bingo(calls: &[u32], boards: &mut [BingoBoard]) -> u32 {
     panic!("Nobody won bingo!");
 }
 
-fn part1() -> u32 {
+fn play_bingo_last_winner(calls: &[u32], boards: &mut [BingoBoard]) -> u32 {
+    let mut boards_remaining = boards.len();
+
+    for call in calls {
+        for board in &mut *boards {
+            // Skip this board if it's already bingo.
+            if board.bingo() {
+                continue;
+            }
+
+            // Otherwise call the number.
+            board.call(*call);
+
+            // Bingo - one less board remaining.
+            if board.bingo() {
+                boards_remaining -= 1;
+
+                // If that was the last board, return the score.
+                if boards_remaining == 0 {
+                    return board.score() * call;
+                }
+            }
+        }
+    }
+
+    panic!("Nobody won bingo!");
+}
+
+fn get_boards_and_calls() -> (Vec<u32>, Vec<BingoBoard>) {
     let file = "data/day4.txt";
 
     // Read test data in, iterate over each line.
@@ -350,11 +430,27 @@ fn part1() -> u32 {
         boards.push(BingoBoard::parse(&mut lines_iter));
     }
 
+    return (calls, boards);
+}
+
+fn part1() -> u32 {
+    let (calls, mut boards) = get_boards_and_calls();
+
     let score = play_bingo(&calls, &mut boards);
+    return score;
+}
+
+fn part2() -> u32 {
+    let (calls, mut boards) = get_boards_and_calls();
+
+    let score = play_bingo_last_winner(&calls, &mut boards);
     return score;
 }
 
 fn main() {
     let score = part1();
     println!("Part 1: Score is {}", score);
+
+    let score = part2();
+    println!("Part 2: Score is {}", score);
 }
