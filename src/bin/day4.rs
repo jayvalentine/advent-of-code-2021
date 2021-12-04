@@ -4,8 +4,7 @@
 use core::iter::Iterator;
 use std::slice::Iter;
 
-use std::fs::File;
-use std::io::{prelude::*, BufReader};
+use aoc::data;
 
 #[cfg(test)]
 mod test_puzzles {
@@ -405,43 +404,30 @@ fn play_bingo_last_winner(calls: &[u32], boards: &mut [BingoBoard]) -> u32 {
     panic!("Nobody won bingo!");
 }
 
-fn get_boards_and_calls() -> (Vec<u32>, Vec<BingoBoard>) {
-    let file = "data/day4.txt";
-
-    // Read test data in, iterate over each line.
-    let f = File::open(file).expect(&format!("Could not open {}", file));
-    let reader = BufReader::new(f);
-
-    let mut lines = Vec::new();
-    for line in reader.lines() {
-        let line_str = line.expect("Invalid line in file!");
-
-        lines.push(line_str);
-    }
-
-    let lines: Vec<&str> = lines.iter().map(|x| x.as_str()).collect();
-
-    let mut lines_iter = lines.iter();
-
-    let calls = parse_calls(&mut lines_iter);
+fn get_boards_and_calls(iter: &mut Iter<&str>) -> (Vec<u32>, Vec<BingoBoard>) {
+    let calls = parse_calls(iter);
     let mut boards = Vec::new();
 
-    while lines_iter.len() > 0 {
-        boards.push(BingoBoard::parse(&mut lines_iter));
+    while iter.len() > 0 {
+        boards.push(BingoBoard::parse(iter));
     }
 
     return (calls, boards);
 }
 
+fn get_data() -> (Vec<u32>, Vec<BingoBoard>) {
+    return data::get_with_iter("data/day4.txt", &mut get_boards_and_calls);
+}
+
 fn part1() -> u32 {
-    let (calls, mut boards) = get_boards_and_calls();
+    let (calls, mut boards) = get_data();
 
     let score = play_bingo(&calls, &mut boards);
     return score;
 }
 
 fn part2() -> u32 {
-    let (calls, mut boards) = get_boards_and_calls();
+    let (calls, mut boards) = get_data();
 
     let score = play_bingo_last_winner(&calls, &mut boards);
     return score;
