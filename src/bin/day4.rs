@@ -41,7 +41,7 @@ mod test_examples {
             boards.push(BingoBoard::parse(&mut input_iter))
         }
 
-        let score = play_bingo(&calls, &boards);
+        let score = play_bingo(&calls, &mut boards);
 
         assert_eq!(4512, score);
     }
@@ -83,7 +83,7 @@ mod test_parse_board {
             " 1  4 90 63 12",
             "11 13  5  9 10",
             "34 35 36 37 38",
-            "89 78 67 56 45"
+            "89 78 67 56 45",
         ];
 
         let mut input_iter = input.iter();
@@ -222,7 +222,11 @@ impl BingoBoard {
         let mut grid = [[0; 5]; 5];
 
         for y in 0..5 {
-            let row_str = input.next().expect("Missing row!");
+            let mut row_str = input.next().expect("Missing row!");
+            while row_str.trim().is_empty() {
+                row_str = input.next().expect("Missing row!");
+            }
+            
             let mut row_iter = row_str.split_whitespace();
             for x in 0..5 {
                 let n: u32 = row_iter.next().expect("Incomplete row!")
@@ -279,6 +283,19 @@ impl BingoBoard {
 
         return false;
     }
+
+    fn score(&self) -> u32 {
+        let mut score = 0;
+        for y in 0..5 {
+            for x in 0..5 {
+                if !self.marks[y][x] {
+                    score += self.grid[y][x];
+                }
+            }
+        }
+
+        return score;
+    }
 }
 
 fn parse_calls(iter: &mut Iter<&str>) -> Vec<u32> {
@@ -291,8 +308,17 @@ fn parse_calls(iter: &mut Iter<&str>) -> Vec<u32> {
     return calls;
 }
 
-fn play_bingo(calls: &[u32], boards: &[BingoBoard]) -> u32 {
-    return 0;
+fn play_bingo(calls: &[u32], boards: &mut [BingoBoard]) -> u32 {
+    for call in calls {
+        for board in &mut *boards {
+            board.call(*call);
+            if board.bingo() {
+                return board.score() * call;
+            }
+        }
+    }
+
+    panic!("Nobody won bingo!");
 }
 
 fn main() {
