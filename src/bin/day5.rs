@@ -110,6 +110,10 @@ struct Line {
     p2: Point
 }
 
+struct Grid {
+    grid: Vec<Vec<u32>>
+}
+
 #[derive(Debug)]
 enum PointParseError {
     MissingX,
@@ -173,8 +177,96 @@ impl FromStr for Line {
     }
 }
 
+impl Grid {
+    fn new(x: usize, y: usize) -> Grid {
+        let mut rows = Vec::new();
+        for r in 0..(y+1) {
+            let mut row = vec![0; x+1];
+            rows.push(row);
+        }
+
+        return Grid { grid: rows };
+    }
+
+    fn set(&mut self, x: usize, y: usize, val: u32) {
+        self.grid[y][x] = val;
+    }
+
+    fn get(&self, x: usize, y: usize) -> u32 {
+        return self.grid[y][x];
+    }
+
+    // Counts the number of grid squares for which the predicate is true.
+    fn count(&self, f: &dyn Fn(u32) -> bool) -> u32 {
+        let mut count = 0;
+
+        for row in &self.grid {
+            for col in row {
+                if f(*col) { count += 1; }
+            }
+        }
+        
+        return count;
+    }
+}
+
+fn max_x(lines: &[Line]) -> u32 {
+    let mut x = 0;
+    for l in lines {
+        if l.p1.x > x { x = l.p1.x }
+        if l.p2.x > x { x = l.p2.x }
+    }
+
+    return x;
+}
+
+fn max_y(lines: &[Line]) -> u32 {
+    let mut y = 0;
+    for l in lines {
+        if l.p1.y > y { y = l.p1.y }
+        if l.p2.y > y { y = l.p2.y }
+    }
+
+    return y;
+}
+
 fn overlapping_lines(lines: &[Line]) -> u32 {
-    return 0;
+    // Get maximum X and Y.
+    let max_x = max_x(lines);
+    let max_y = max_y(lines);
+
+    // Create the grid.
+    let mut grid = Grid::new(max_x as usize, max_y as usize);
+
+    // For each line, plot on the grid.
+    for line in lines {
+        // Plot the line.
+        if line.p1.x == line.p2.x {
+            let x = line.p1.x as usize;
+
+            let y_start = line.p1.y.min(line.p2.y);
+            let y_end = line.p1.y.max(line.p2.y);
+
+            for y in y_start..(y_end+1) {
+                let y = y as usize;
+                grid.set(x, y, grid.get(x, y) + 1);
+            }
+        }
+        else if line.p1.y == line.p2.y {
+            let y = line.p1.y as usize;
+
+            let x_start = line.p1.x.min(line.p2.x);
+            let x_end = line.p1.x.max(line.p2.x);
+
+            for x in x_start..(x_end+1) {
+                let x = x as usize;
+                grid.set(x, y, grid.get(x, y) + 1);
+            }
+        }
+    }
+
+    // Return number of squares with more than one line.
+    return grid.count(&|n| n > 1);
 }
 
 fn main() {
