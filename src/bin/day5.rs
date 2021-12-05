@@ -3,6 +3,17 @@
 
 use std::str::FromStr;
 
+use aoc::data;
+
+#[cfg(test)]
+mod test_puzzles {
+    #[test]
+    fn part1() {
+        let overlapping = super::part1();
+        assert_eq!(5373, overlapping);
+    }
+}
+
 #[cfg(test)]
 mod test_examples {
     use super::*;
@@ -30,6 +41,31 @@ mod test_examples {
 
         let overlapping = overlapping_lines(&lines);
         assert_eq!(5, overlapping);
+    }
+
+    #[test]
+    fn part2() {
+        let input = vec![
+            "0,9 -> 5,9",
+            "8,0 -> 0,8",
+            "9,4 -> 3,4",
+            "2,2 -> 2,1",
+            "7,0 -> 7,4",
+            "6,4 -> 2,0",
+            "0,9 -> 2,9",
+            "3,4 -> 1,4",
+            "0,0 -> 8,8",
+            "5,5 -> 8,2"
+        ];
+
+        let mut lines = Vec::new();
+        for s in input {
+            let l = Line::from_str(s).expect("Line parsing failed!");
+            lines.push(l);
+        }
+
+        let overlapping = overlapping_lines_with_diagonal(&lines);
+        assert_eq!(12, overlapping);
     }
 }
 
@@ -180,8 +216,8 @@ impl FromStr for Line {
 impl Grid {
     fn new(x: usize, y: usize) -> Grid {
         let mut rows = Vec::new();
-        for r in 0..(y+1) {
-            let mut row = vec![0; x+1];
+        for _ in 0..(y+1) {
+            let row = vec![0; x+1];
             rows.push(row);
         }
 
@@ -269,6 +305,69 @@ fn overlapping_lines(lines: &[Line]) -> u32 {
     return grid.count(&|n| n > 1);
 }
 
-fn main() {
+fn overlapping_lines_with_diagonal(lines: &[Line]) -> u32 {
+    // Get maximum X and Y.
+    let max_x = max_x(lines);
+    let max_y = max_y(lines);
 
+    // Create the grid.
+    let mut grid = Grid::new(max_x as usize, max_y as usize);
+
+    // For each line, plot on the grid.
+    for line in lines {
+        println!("{},{} -> {},{}", line.p1.x, line.p1.y, line.p2.x, line.p2.y);
+        // Calculate dx and dy.
+        let dx = if line.p1.x > line.p2.x {
+            -1
+        }
+        else if line.p2.x > line.p1.x {
+            1
+        }
+        else {
+            0
+        };
+        
+        let dy = if line.p1.y > line.p2.y {
+            -1
+        }
+        else if line.p2.y > line.p1.y {
+            1
+        }
+        else {
+            0
+        };
+
+        let mut x = line.p1.x as i32;
+        let mut y = line.p1.y as i32;
+
+        let x_end = line.p2.x as i32;
+        let y_end = line.p2.y as i32;
+
+        loop {
+            println!("x: {}, y: {}", x, y);
+            grid.set(x as usize, y as usize, grid.get(x as usize, y as usize) + 1);
+            x += dx;
+            y += dy;
+
+            if (x == x_end) && (y == y_end) {
+                break;
+            }
+        }
+
+        grid.set(x_end as usize, y_end as usize, grid.get(x_end as usize, y_end as usize) + 1);
+    }
+
+    // Return number of squares with more than one line.
+    return grid.count(&|n| n > 1);
+}
+
+fn part1() -> u32 {
+    let input = data::get("data/day5.txt");
+
+    return overlapping_lines(&input);
+}
+
+fn main() {
+    let overlapping = part1();
+    println!("The number of overlapping vents is {}", overlapping);
 }
