@@ -12,6 +12,12 @@ mod test_puzzles {
         let overlapping = super::part1();
         assert_eq!(5373, overlapping);
     }
+
+    #[test]
+    fn part2() {
+        let overlapping = super::part2();
+        assert_eq!(21514, overlapping);
+    }
 }
 
 #[cfg(test)]
@@ -315,7 +321,6 @@ fn overlapping_lines_with_diagonal(lines: &[Line]) -> u32 {
 
     // For each line, plot on the grid.
     for line in lines {
-        println!("{},{} -> {},{}", line.p1.x, line.p1.y, line.p2.x, line.p2.y);
         // Calculate dx and dy.
         let dx = if line.p1.x > line.p2.x {
             -1
@@ -344,7 +349,6 @@ fn overlapping_lines_with_diagonal(lines: &[Line]) -> u32 {
         let y_end = line.p2.y as i32;
 
         loop {
-            println!("x: {}, y: {}", x, y);
             grid.set(x as usize, y as usize, grid.get(x as usize, y as usize) + 1);
             x += dx;
             y += dy;
@@ -367,7 +371,16 @@ fn part1() -> u32 {
     return overlapping_lines(&input);
 }
 
+fn part2() -> u32 {
+    let input = data::get("data/day5.txt");
+
+    return overlapping_lines_with_diagonal(&input);
+}
+
 fn main() {
     let overlapping = part1();
     println!("The number of overlapping vents is {}", overlapping);
+
+    let overlapping = part2();
+    println!("The number of overlapping vents (with diagonals) is {}", overlapping);
 }
