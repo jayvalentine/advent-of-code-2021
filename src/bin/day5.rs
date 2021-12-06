@@ -45,7 +45,7 @@ mod test_examples {
             lines.push(l);
         }
 
-        let overlapping = overlapping_lines(&lines);
+        let overlapping = overlapping_lines_without_diagonal(&lines);
         assert_eq!(5, overlapping);
     }
 
@@ -70,7 +70,7 @@ mod test_examples {
             lines.push(l);
         }
 
-        let overlapping = overlapping_lines_with_diagonal(&lines);
+        let overlapping = overlapping_lines(&lines);
         assert_eq!(12, overlapping);
     }
 }
@@ -142,11 +142,13 @@ mod test_parse_point {
     }
 }
 
+#[derive(Clone, Copy)]
 struct Point {
     x: u32,
     y: u32
 }
 
+#[derive(Clone, Copy)]
 struct Line {
     p1: Point,
     p2: Point
@@ -272,46 +274,26 @@ fn max_y(lines: &[Line]) -> u32 {
     return y;
 }
 
-fn overlapping_lines(lines: &[Line]) -> u32 {
-    // Get maximum X and Y.
-    let max_x = max_x(lines);
-    let max_y = max_y(lines);
+fn exclude_diagonal(lines: &[Line]) -> Vec<Line> {
+    let mut v = Vec::new();
 
-    // Create the grid.
-    let mut grid = Grid::new(max_x as usize, max_y as usize);
-
-    // For each line, plot on the grid.
-    for line in lines {
-        // Plot the line.
-        if line.p1.x == line.p2.x {
-            let x = line.p1.x as usize;
-
-            let y_start = line.p1.y.min(line.p2.y);
-            let y_end = line.p1.y.max(line.p2.y);
-
-            for y in y_start..(y_end+1) {
-                let y = y as usize;
-                grid.set(x, y, grid.get(x, y) + 1);
-            }
-        }
-        else if line.p1.y == line.p2.y {
-            let y = line.p1.y as usize;
-
-            let x_start = line.p1.x.min(line.p2.x);
-            let x_end = line.p1.x.max(line.p2.x);
-
-            for x in x_start..(x_end+1) {
-                let x = x as usize;
-                grid.set(x, y, grid.get(x, y) + 1);
-            }
+    for l in lines {
+        if (l.p1.x == l.p2.x) || (l.p1.y == l.p2.y) {
+            v.push(*l);
         }
     }
 
-    // Return number of squares with more than one line.
-    return grid.count(&|n| n > 1);
+    return v;
 }
 
-fn overlapping_lines_with_diagonal(lines: &[Line]) -> u32 {
+fn overlapping_lines_without_diagonal(lines: &[Line]) -> u32 {
+    let lines = exclude_diagonal(&lines);
+
+    // Return number of squares with more than one line.
+    return overlapping_lines(&lines);
+}
+
+fn overlapping_lines(lines: &[Line]) -> u32 {
     // Get maximum X and Y.
     let max_x = max_x(lines);
     let max_y = max_y(lines);
@@ -368,13 +350,13 @@ fn overlapping_lines_with_diagonal(lines: &[Line]) -> u32 {
 fn part1() -> u32 {
     let input = data::get("data/day5.txt");
 
-    return overlapping_lines(&input);
+    return overlapping_lines_without_diagonal(&input);
 }
 
 fn part2() -> u32 {
     let input = data::get("data/day5.txt");
 
-    return overlapping_lines_with_diagonal(&input);
+    return overlapping_lines(&input);
 }
 
 fn main() {
