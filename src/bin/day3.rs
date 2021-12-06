@@ -248,5 +248,5 @@ fn main() {
 
     let rates = part2();
     let power = rates.oxygen * rates.co2;
-    println!("Gamma: {}, Epsilon: {} (Power Consumption {})", rates.oxygen, rates.co2, power);
+    println!("Oxygen: {}, CO2: {} (Power Consumption {})", rates.oxygen, rates.co2, power);
 }
