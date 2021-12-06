@@ -232,12 +232,12 @@ fn find_rates_co2(input: &[u32], width: usize) -> u32 {
 }
 
 fn part1() -> Rates {
-    let input = data::get_bin("data/day3.txt");
+    let input = data::get_with("data/day3.txt", &|s| u32::from_str_radix(s, 2)).expect("Error parsing input!");
     return find_rates(&input, 12);
 }
 
 fn part2() -> LifeSupportRates {
-    let input = data::get_bin("data/day3.txt");
+    let input = data::get_with("data/day3.txt", &|s| u32::from_str_radix(s, 2)).expect("Error parsing input!");
     return find_rates_life_support(&input, 12);
 }
 
