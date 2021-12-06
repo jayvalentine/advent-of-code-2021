@@ -37,38 +37,6 @@ mod test_examples {
 }
 
 #[cfg(test)]
-mod test_lanternfish {
-    use super::*;
-
-    #[test]
-    fn test_tick() {
-        let mut l = Lanternfish { timer: 3 };
-        let s = l.tick();
-
-        assert_eq!(None, s);
-        assert_eq!(2, l.timer);
-    }
-
-    #[test]
-    fn test_tick_0() {
-        let mut l = Lanternfish { timer: 0 };
-        let s = l.tick();
-
-        assert_eq!(Some(8), s);
-        assert_eq!(6, l.timer);
-    }
-
-    #[test]
-    fn test_tick_1() {
-        let mut l = Lanternfish { timer: 1 };
-        let s = l.tick();
-
-        assert_eq!(None, s);
-        assert_eq!(0, l.timer);
-    }
-}
-
-#[cfg(test)]
 mod test_tick {
     use super::*;
 
@@ -121,23 +89,6 @@ mod test_tick {
         assert_eq!(4, p2[6]);
         assert_eq!(1, p2[7]);
         assert_eq!(2, p2[8]);
-    }
-}
-
-struct Lanternfish {
-    timer: u32
-}
-
-impl Lanternfish {
-    fn tick(&mut self) -> Option<u32> {
-        if self.timer == 0 {
-            self.timer = 6;
-            return Some(8);
-        }
-        else {
-            self.timer -= 1;
-            return None;
-        }
     }
 }
 
