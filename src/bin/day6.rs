@@ -129,9 +129,7 @@ fn lanternfish_pop(initial_pop: &[u32], days: u32) -> u64 {
 
 fn get_data() -> Vec<u32> {
     let v: Vec<u32> = data::get_with_iter("data/day6.txt", &mut |iter|
-        iter.next().expect("Error in input file!")
-            .split(',').map(|x| x.parse::<u32>().expect("Parse error in input file!"))
-            .collect()
+        data::from_separated(iter.next().expect("Data parse error!"), ',').expect("Data parse error!")
     );
 
     return v;

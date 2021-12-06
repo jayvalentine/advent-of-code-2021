@@ -62,3 +62,12 @@ pub fn get_with_iter<T>(file: &str, f_iter: &mut dyn Fn(&mut Iter<&str>) -> T) -
 
     return f_iter(&mut input.iter());
 }
+
+pub fn from_separated<T: FromStr>(s: &str, sep: char) -> Result<Vec<T>, T::Err> {
+    let mut v = Vec::new();
+    for i in s.split(sep) {
+        v.push(T::from_str(i)?)
+    }
+
+    return Ok(v);
+}
