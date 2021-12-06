@@ -9,6 +9,11 @@ mod test_puzzles {
     fn part1() {
         assert_eq!(377263, super::part1());
     }
+
+    #[test]
+    fn part2() {
+        assert_eq!(1695929023803, super::part2());
+    }
 }
 
 #[cfg(test)]
