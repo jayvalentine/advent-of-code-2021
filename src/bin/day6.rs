@@ -127,13 +127,23 @@ fn lanternfish_pop(initial_pop: &[u32], days: u32) -> u64 {
     return population.iter().fold(0, |acc, x| acc + x);
 }
 
+fn get_data() -> Vec<u32> {
+    let v: Vec<u32> = data::get_with_iter("data/day6.txt", &mut |iter|
+        iter.next().expect("Error in input file!")
+            .split(',').map(|x| x.parse::<u32>().expect("Parse error in input file!"))
+            .collect()
+    );
+
+    return v;
+}
+
 fn part1() -> u64 {
-    let initial_pop = data::get("data/day6.txt");
+    let initial_pop = get_data();
     return lanternfish_pop(&initial_pop, 80);
 }
 
 fn part2() -> u64 {
-    let initial_pop = data::get("data/day6.txt");
+    let initial_pop = get_data();
     return lanternfish_pop(&initial_pop, 256);
 }
 
