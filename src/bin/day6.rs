@@ -114,7 +114,7 @@ fn next_pop(pop: Vec<u64>) -> Vec<u64> {
     return new_pop;
 }
 
-fn lanternfish_pop(initial_pop: &[u32], days: u32) -> usize {
+fn lanternfish_pop(initial_pop: &[u32], days: u32) -> u64 {
     let mut population = vec![0; 9];
     for &p in initial_pop {
         population[p as usize] += 1;
@@ -124,15 +124,15 @@ fn lanternfish_pop(initial_pop: &[u32], days: u32) -> usize {
         population = next_pop(population);
     }
 
-    return population.iter().fold(0, |acc, x| acc + x) as usize;
+    return population.iter().fold(0, |acc, x| acc + x);
 }
 
-fn part1() -> usize {
+fn part1() -> u64 {
     let initial_pop = data::get("data/day6.txt");
     return lanternfish_pop(&initial_pop, 80);
 }
 
-fn part2() -> usize {
+fn part2() -> u64 {
     let initial_pop = data::get("data/day6.txt");
     return lanternfish_pop(&initial_pop, 256);
 }
