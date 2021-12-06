@@ -63,13 +63,27 @@ impl Lanternfish {
     }
 }
 
-fn lanternfish_pop(initial_pop: &[u32], days: u32) -> u32 {
+fn lanternfish_pop(initial_pop: &[u32], days: u32) -> usize {
     let mut lanternfish: Vec<Lanternfish> = Vec::new();
     for n in initial_pop {
         lanternfish.push(Lanternfish { timer: *n });
     }
 
-    return 0;
+    for _ in 0..days {
+        let mut new_lanternfish = Vec::new();
+        for l in &mut lanternfish {
+            let s = l.tick();
+            if s.is_some() {
+                new_lanternfish.push(s.unwrap());
+            }
+        }
+
+        for n in new_lanternfish {
+            lanternfish.push(Lanternfish { timer: n })
+        }
+    }
+
+    return lanternfish.len();
 }
 
 fn main() {
