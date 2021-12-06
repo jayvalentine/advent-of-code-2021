@@ -1,6 +1,16 @@
 // Advent of Code 2021
 // Day 6
 
+use aoc::data;
+
+#[cfg(test)]
+mod test_puzzles {
+    #[test]
+    fn part1() {
+        assert_eq!(377263, super::part1());
+    }
+}
+
 #[cfg(test)]
 mod test_examples {
     use super::*;
@@ -86,6 +96,12 @@ fn lanternfish_pop(initial_pop: &[u32], days: u32) -> usize {
     return lanternfish.len();
 }
 
-fn main() {
+fn part1() -> usize {
+    let initial_pop = data::get("data/day6.txt");
+    return lanternfish_pop(&initial_pop, 80);
+}
 
+fn main() {
+    let final_pop = part1();
+    println!("Final lanternfish population after 80 days is {}", final_pop);
 }
