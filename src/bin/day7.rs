@@ -1,6 +1,16 @@
 // Advent of Code
 // Day 7
 
+use aoc::data;
+
+#[cfg(test)]
+mod test_puzzles {
+    #[test]
+    fn part1() {
+        assert_eq!(352997, super::part1());
+    }
+}
+
 #[cfg(test)]
 mod test_examples {
     use super::*;
@@ -68,10 +78,60 @@ fn possible_positions(pos: i32, max_pos: i32) -> Vec<i32> {
     return positions;
 }
 
+fn max_pos(crabs: &[i32]) -> i32 {
+    let mut pos = 0;
+    for &c in crabs {
+        if c > pos {
+            pos = c;
+        }
+    }
+
+    return pos;
+}
+
 fn min_fuel_position(crabs: &[i32]) -> (i32, i32) {
-    return (0, 0);
+    let max = max_pos(crabs);
+
+    // Get fuel cost for each crab for each position.
+    let mut costs = Vec::new();
+    for &c in crabs {
+        costs.push(possible_positions(c, max));
+    }
+
+    // Iterate over each position and find the minimum.
+    let mut min = i32::MAX;
+    let mut min_pos = 0;
+
+    for p in 0..(max+1) {
+        let mut sum = 0;
+        for cost in &costs {
+            sum += cost[p as usize];
+        }
+
+        if sum < min {
+            min = sum;
+            min_pos = p;
+        }
+    }
+
+    return (min_pos, min);
+}
+
+fn get_data() -> Vec<i32> {
+    let v: Vec<i32> = data::get_with_iter("data/day7.txt", &mut |iter|
+        data::from_separated(iter.next().expect("Data parse error!"), ',').expect("Data parse error!")
+    );
+
+    return v;
+}
+
+fn part1() -> i32 {
+    let crabs = get_data();
+    let (_position, fuel) = min_fuel_position(&crabs);
+    return fuel;
 }
 
 fn main() {
-
+    let fuel = part1();
+    println!("Part 1: Minimum fuel required is {}", fuel);
 }
