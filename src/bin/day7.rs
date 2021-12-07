@@ -19,7 +19,7 @@ mod test_examples {
     fn part1() {
         let crabs = vec![16, 1, 2, 0, 4, 2, 7, 1, 2, 14];
 
-        let (pos, fuel) = min_fuel_position(&crabs);
+        let (pos, fuel) = min_fuel_position_linear(&crabs);
         assert_eq!(2, pos);
         assert_eq!(37, fuel);
     }
@@ -89,13 +89,17 @@ fn max_pos(crabs: &[i32]) -> i32 {
     return pos;
 }
 
-fn min_fuel_position(crabs: &[i32]) -> (i32, i32) {
+fn min_fuel_position_linear(crabs: &[i32]) -> (i32, i32) {
+    return min_fuel_position(crabs, &possible_positions);
+}
+
+fn min_fuel_position(crabs: &[i32], f_pos: &dyn Fn(i32, i32) -> Vec<i32>) -> (i32, i32) {
     let max = max_pos(crabs);
 
     // Get fuel cost for each crab for each position.
     let mut costs = Vec::new();
     for &c in crabs {
-        costs.push(possible_positions(c, max));
+        costs.push(f_pos(c, max));
     }
 
     // Iterate over each position and find the minimum.
@@ -127,7 +131,7 @@ fn get_data() -> Vec<i32> {
 
 fn part1() -> i32 {
     let crabs = get_data();
-    let (_position, fuel) = min_fuel_position(&crabs);
+    let (_position, fuel) = min_fuel_position_linear(&crabs);
     return fuel;
 }
 
