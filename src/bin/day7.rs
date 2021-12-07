@@ -11,6 +11,11 @@ mod test_puzzles {
     fn part1() {
         assert_eq!(352997, super::part1());
     }
+
+    #[test]
+    fn part2() {
+        assert_eq!(101571302, super::part2());
+    }
 }
 
 #[cfg(test)]
@@ -124,28 +129,6 @@ mod test_positions_increasing {
     }
 }
 
-fn possible_positions(pos: i32, max_pos: i32) -> Vec<i32> {
-    let mut positions = Vec::new();
-    for i in 0..(max_pos+1) {
-        positions.push((pos - i).abs());
-    }
-
-    return positions;
-}
-
-fn possible_positions_increasing(pos: i32, max_pos: i32) -> Vec<i32> {
-    let mut positions = Vec::new();
-    for i in 0..(max_pos+1) {
-        let distance = (pos - i).abs();
-        
-        // It's a triangular progression :)
-        let cost = (distance * (distance + 1)) / 2;
-        positions.push(cost);
-    }
-
-    return positions;
-}
-
 fn max_pos(crabs: &[i32]) -> i32 {
     let mut pos = 0;
     for &c in crabs {
@@ -158,21 +141,15 @@ fn max_pos(crabs: &[i32]) -> i32 {
 }
 
 fn min_fuel_position_linear(crabs: &[i32]) -> (i32, i32) {
-    return min_fuel_position(crabs, &possible_positions);
+    return min_fuel_position(crabs, &|dist| dist);
 }
 
 fn min_fuel_position_increasing(crabs: &[i32]) -> (i32, i32) {
-    return min_fuel_position(crabs, &possible_positions_increasing);
+    return min_fuel_position(crabs, &|dist| ((dist) * (dist+1)) / 2);
 }
 
-fn min_fuel_position(crabs: &[i32], f_pos: &dyn Fn(i32, i32) -> Vec<i32>) -> (i32, i32) {
+fn min_fuel_position(crabs: &[i32], f_pos: &dyn Fn(i32) -> i32) -> (i32, i32) {
     let max = max_pos(crabs);
-
-    // Get fuel cost for each crab for each position.
-    let mut costs = Vec::new();
-    for &c in crabs {
-        costs.push(f_pos(c, max));
-    }
 
     // Iterate over each position and find the minimum.
     let mut min = i32::MAX;
@@ -180,8 +157,8 @@ fn min_fuel_position(crabs: &[i32], f_pos: &dyn Fn(i32, i32) -> Vec<i32>) -> (i3
 
     for p in 0..(max+1) {
         let mut sum = 0;
-        for cost in &costs {
-            sum += cost[p as usize];
+        for &c in crabs {
+            sum += f_pos((c - p).abs());
         }
 
         if sum < min {
