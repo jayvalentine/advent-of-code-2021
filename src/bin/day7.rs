@@ -1,6 +1,8 @@
 // Advent of Code
 // Day 7
 
+use std::time::{Instant};
+
 use aoc::data;
 
 #[cfg(test)]
@@ -212,9 +214,14 @@ fn part2() -> i32 {
 }
 
 fn main() {
+    let start = Instant::now();
+
     let fuel = part1();
     println!("Part 1: Minimum fuel required is {}", fuel);
 
     let fuel = part2();
     println!("Part 2: Minimum fuel required is {}", fuel);
+
+    let elapsed = start.elapsed().as_secs_f32();
+    println!("Done in {:.4}", elapsed);
 }
