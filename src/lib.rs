@@ -8,7 +8,7 @@ pub fn part<T: Display>(s: &str, descr: &str, f: &dyn Fn() -> T) {
 
     let result = f();
 
-    println!("{:20} {:20} {:15} {:.4}", s, descr, result, start.elapsed().as_secs_f32());
+    println!("{:15} {:25} {:<20} {:.4}", s, descr, result, start.elapsed().as_secs_f32());
 }
 
 #[macro_export]
