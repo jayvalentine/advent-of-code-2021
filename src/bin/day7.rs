@@ -23,6 +23,15 @@ mod test_examples {
         assert_eq!(2, pos);
         assert_eq!(37, fuel);
     }
+
+    #[test]
+    fn part2() {
+        let crabs = vec![16, 1, 2, 0, 4, 2, 7, 1, 2, 14];
+
+        let (pos, fuel) = min_fuel_position_increasing(&crabs);
+        assert_eq!(5, pos);
+        assert_eq!(168, fuel);
+    }
 }
 
 #[cfg(test)]
@@ -69,10 +78,67 @@ mod test_positions {
     }
 }
 
+#[cfg(test)]
+mod test_positions_increasing {
+    use super::*;
+
+    #[test]
+    fn position_1() {
+        let positions = possible_positions_increasing(1, 5);
+        assert_eq!(6, positions.len());
+
+        assert_eq!(1, positions[0]);
+        assert_eq!(0, positions[1]);
+        assert_eq!(1, positions[2]);
+        assert_eq!(3, positions[3]);
+        assert_eq!(6, positions[4]);
+        assert_eq!(10, positions[5]);
+    }
+
+    #[test]
+    fn position_3() {
+        let positions = possible_positions_increasing(3, 5);
+        assert_eq!(6, positions.len());
+        
+        assert_eq!(6, positions[0]);
+        assert_eq!(3, positions[1]);
+        assert_eq!(1, positions[2]);
+        assert_eq!(0, positions[3]);
+        assert_eq!(1, positions[4]);
+        assert_eq!(3, positions[5]);
+    }
+
+    #[test]
+    fn position_5() {
+        let positions = possible_positions_increasing(5, 5);
+        assert_eq!(6, positions.len());
+        
+        assert_eq!(15, positions[0]);
+        assert_eq!(10, positions[1]);
+        assert_eq!(6, positions[2]);
+        assert_eq!(3, positions[3]);
+        assert_eq!(1, positions[4]);
+        assert_eq!(0, positions[5]);
+    }
+}
+
 fn possible_positions(pos: i32, max_pos: i32) -> Vec<i32> {
     let mut positions = Vec::new();
     for i in 0..(max_pos+1) {
         positions.push((pos - i).abs());
+    }
+
+    return positions;
+}
+
+fn possible_positions_increasing(pos: i32, max_pos: i32) -> Vec<i32> {
+    let mut positions = Vec::new();
+    for i in 0..(max_pos+1) {
+        let distance = (pos - i).abs();
+        
+        // It's a triangular progression :)
+        let cost = (distance * (distance + 1)) / 2;
+        positions.push(cost);
     }
 
     return positions;
@@ -91,6 +157,10 @@ fn max_pos(crabs: &[i32]) -> i32 {
 
 fn min_fuel_position_linear(crabs: &[i32]) -> (i32, i32) {
     return min_fuel_position(crabs, &possible_positions);
+}
+
+fn min_fuel_position_increasing(crabs: &[i32]) -> (i32, i32) {
+    return min_fuel_position(crabs, &possible_positions_increasing);
 }
 
 fn min_fuel_position(crabs: &[i32], f_pos: &dyn Fn(i32, i32) -> Vec<i32>) -> (i32, i32) {
@@ -135,7 +205,16 @@ fn part1() -> i32 {
     return fuel;
 }
 
+fn part2() -> i32 {
+    let crabs = get_data();
+    let (_position, fuel) = min_fuel_position_increasing(&crabs);
+    return fuel;
+}
+
 fn main() {
     let fuel = part1();
     println!("Part 1: Minimum fuel required is {}", fuel);
+
+    let fuel = part2();
+    println!("Part 2: Minimum fuel required is {}", fuel);
 }
