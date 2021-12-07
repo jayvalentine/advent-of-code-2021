@@ -7,18 +7,12 @@ use aoc::data;
 mod test_puzzles {
     #[test]
     fn part1() {
-        let rates = super::part1();
-
-        assert_eq!(1816, rates.gamma);
-        assert_eq!(2279, rates.epsilon)
+        assert_eq!(1816*2279, super::part1());
     }
 
     #[test]
     fn part2() {
-        let rates = super::part2();
-
-        assert_eq!(2031, rates.oxygen);
-        assert_eq!(2104, rates.co2)
+        assert_eq!(2031*2104, super::part2());
     }
 }
 
@@ -231,22 +225,18 @@ fn find_rates_co2(input: &[u32], width: usize) -> u32 {
     return find_rates_with_closure(input, width, &|x, y| x < y);
 }
 
-fn part1() -> Rates {
+fn part1() -> u32 {
     let input = data::get_with("data/day3.txt", &|s| u32::from_str_radix(s, 2)).expect("Error parsing input!");
-    return find_rates(&input, 12);
+    let rates = find_rates(&input, 12);
+    return rates.epsilon * rates.gamma;
 }
 
-fn part2() -> LifeSupportRates {
+fn part2() -> u32 {
     let input = data::get_with("data/day3.txt", &|s| u32::from_str_radix(s, 2)).expect("Error parsing input!");
-    return find_rates_life_support(&input, 12);
+    let rates = find_rates_life_support(&input, 12);
+    return rates.oxygen * rates.co2;
 }
 
 fn main() {
-    let rates = part1();
-    let power = rates.gamma * rates.epsilon;
-    println!("Gamma: {}, Epsilon: {} (Power Consumption {})", rates.gamma, rates.epsilon, power);
-
-    let rates = part2();
-    let power = rates.oxygen * rates.co2;
-    println!("Oxygen: {}, CO2: {} (Power Consumption {})", rates.oxygen, rates.co2, power);
+    aoc::solution!(3, "power consumption", "life support");
 }

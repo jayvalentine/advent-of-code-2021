@@ -360,9 +360,5 @@ fn part2() -> u32 {
 }
 
 fn main() {
-    let overlapping = part1();
-    println!("The number of overlapping vents is {}", overlapping);
-
-    let overlapping = part2();
-    println!("The number of overlapping vents (with diagonals) is {}", overlapping);
+    aoc::solution!(5, "without diagonals", "with diagonals");
 }

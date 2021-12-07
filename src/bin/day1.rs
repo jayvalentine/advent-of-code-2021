@@ -212,6 +212,5 @@ fn part2() -> u32 {
 }
 
 fn main() {
-    println!("Part 1: The number of depth increases is {}", part1());
-    println!("Part 2: The number of sliding window sum increases is {}", part2());
+    aoc::solution!(1, "depth increases", "with sliding window");
 }

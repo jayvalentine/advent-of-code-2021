@@ -8,18 +8,12 @@ use aoc::data;
 mod test_puzzles {
     #[test]
     fn part1() {
-        let pos = super::part1();
-
-        assert_eq!(916, pos.depth);
-        assert_eq!(1970, pos.horizontal);
+        assert_eq!(916*1970, super::part1());
     }
 
     #[test]
     fn part2() {
-        let pos = super::part2();
-
-        assert_eq!(1000556, pos.depth);
-        assert_eq!(1970, pos.horizontal);
+        assert_eq!(1000556*1970, super::part2());
     }
 }
 
@@ -286,24 +280,20 @@ fn final_position_with_aim(commands: &[Command]) -> Position {
     return pos;
 }
 
-fn part1() -> Position {
+fn part1() -> u32 {
     let commands: Vec<Command> = data::get("data/day2.txt");
 
-    return final_position(&commands);
+    let pos = final_position(&commands);
+    return pos.depth * pos.horizontal;
 }
 
-fn part2() -> Position {
+fn part2() -> u32 {
     let commands: Vec<Command> = data::get("data/day2.txt");
 
-    return final_position_with_aim(&commands);
+    let pos = final_position_with_aim(&commands);
+    return pos.depth * pos.horizontal;
 }
 
 fn main() {
-    let final_pos = part1();
-    let product = final_pos.depth * final_pos.horizontal;
-    println!("Part 1: Final position is (d{}, h{}) (product {})", final_pos.depth, final_pos.horizontal, product);
-
-    let final_pos = part2();
-    let product = final_pos.depth * final_pos.horizontal;
-    println!("Part 2: Final position is (d{}, h{}) (product {})", final_pos.depth, final_pos.horizontal, product);
+    aoc::solution!(2, "simple", "with aim");
 }

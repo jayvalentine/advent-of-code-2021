@@ -146,9 +146,5 @@ fn part2() -> u64 {
 }
 
 fn main() {
-    let final_pop = part1();
-    println!("Final lanternfish population after 80 days is {}", final_pop);
-
-    let final_pop = part2();
-    println!("Final lanternfish population after 256 days is {}", final_pop);
+    aoc::solution!(6, "80th day pop.", "256th day pop.");
 }

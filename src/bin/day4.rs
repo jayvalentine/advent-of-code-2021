@@ -434,9 +434,5 @@ fn part2() -> u32 {
 }
 
 fn main() {
-    let score = part1();
-    println!("Part 1: Score is {}", score);
-
-    let score = part2();
-    println!("Part 2: Score is {}", score);
+    aoc::solution!(4, "first to win", "last to win");
 }
