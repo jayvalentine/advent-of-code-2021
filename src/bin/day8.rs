@@ -1,7 +1,8 @@
 // Advent of Code
 // Day 8
 
-use std::iter::FromIterator;
+use std::{iter::FromIterator, slice::Iter};
+use std::str::FromStr;
 
 #[cfg(test)]
 mod test_examples {
@@ -22,7 +23,9 @@ mod test_examples {
             "fgae cfgab fg bagce"
         ];
 
-        let count = count_digits(&input, &['1', '4', '7', '8']);
+        let input: Vec<String> = input.iter().map(|s| String::from_str(s).expect("Parse error!")).collect();
+
+        let count = count_segments(&input, &[2, 4, 3, 7]);
         assert_eq!(26, count);
     }
 }
@@ -186,12 +189,35 @@ fn digit(s: &str) -> Option<char> {
     }
 }
 
-fn count_digits(segments: &[&str], digits: &[char]) -> u32 {
-    return 0;
+fn count_segments(segments: &[String], num_segments: &[u32]) -> u32 {
+    let mut count = 0;
+
+    for line in segments {
+        for seg in line.split_whitespace() {
+            if num_segments.contains(&(seg.len() as u32)) { count += 1; }
+        }
+    }
+
+    return count;
+}
+
+fn get_segments(i: &mut Iter<&str>) -> Vec<String> {
+    let mut v = Vec::new();
+
+    for line in i {
+        let s = line.split(" | ").nth(1).expect("Parse error!");
+        for seg in s.split_whitespace() {
+            v.push(seg.to_owned());
+        }
+    }
+
+    return v;
 }
 
 fn part1() -> u32 {
-    return 0;
+    let input: Vec<String> = aoc::data::get_with_iter("data/day8.txt", &mut get_segments);
+
+    return count_segments(&input, &[2, 4, 3, 7]);
 }
 
 fn part2() -> u32 {
