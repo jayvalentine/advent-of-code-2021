@@ -7,6 +7,19 @@ use std::str::FromStr;
 use core::fmt::Display;
 
 #[cfg(test)]
+mod test_puzzles {
+    #[test]
+    fn part1() {
+        assert_eq!(375, super::part1());
+    }
+
+    #[test]
+    fn part2() {
+        assert_eq!(1019355, super::part2());
+    }
+}
+
+#[cfg(test)]
 mod test_examples {
     use super::*;
 
@@ -534,20 +547,7 @@ fn count_segments(segments: &[String], num_segments: &[u32]) -> u32 {
     return count;
 }
 
-fn get_segments(i: &mut Iter<&str>) -> Vec<String> {
-    let mut v = Vec::new();
-
-    for line in i {
-        let s = line.split(" | ").nth(1).expect("Parse error!");
-        for seg in s.split_whitespace() {
-            v.push(seg.to_owned());
-        }
-    }
-
-    return v;
-}
-
-fn get_segment_config(patterns: &[&str]) -> SegmentDisplay {
+fn get_segment_config(patterns: &[String]) -> SegmentDisplay {
     // First exclude down to the minimal.
     
     let mut seg = SegmentDisplay::init();
@@ -572,7 +572,7 @@ fn get_segment_config(patterns: &[&str]) -> SegmentDisplay {
     panic!("Didn't find a configuration!");
 }
 
-fn get_output(patterns: &[&str], output_patterns: &[&str]) -> u32 {
+fn get_output(patterns: &[String], output_patterns: &[String]) -> u32 {
     // Get the segment display configuration.
     let seg = get_segment_config(patterns);
 
@@ -586,37 +586,46 @@ fn get_output(patterns: &[&str], output_patterns: &[&str]) -> u32 {
     return val;
 }
 
-fn part1() -> u32 {
-    let input: Vec<String> = aoc::data::get_with_iter("data/day8.txt", &mut get_segments);
+fn get_segments(i: &mut Iter<&str>) -> Vec<(Vec<String>, Vec<String>)> {
+    let mut v = Vec::new();
 
-    return count_segments(&input, &[2, 4, 3, 7]);
+    for line in i {
+        let mut iter = line.split(" | ");
+        let patterns = iter.next().expect("Parse ereor!");
+        let patterns = patterns.split_whitespace().map(|s| String::from(s)).collect();
+        let output = iter.next().expect("Parse error!");
+        let output = output.split_whitespace().map(|s| String::from(s)).collect();
+
+        v.push((patterns, output));
+    }
+
+    return v;
+}
+
+fn get_data() -> Vec<(Vec<String>, Vec<String>)> {
+    return aoc::data::get_with_iter("data/day8.txt", &mut get_segments);
+}
+
+fn part1() -> u32 {
+    let input = get_data();
+    let mut outputs = Vec::new();
+    for mut i in input {
+        outputs.append(&mut i.1);
+    }
+
+    return count_segments(&outputs, &[2, 4, 3, 7]);
 }
 
 fn part2() -> u32 {
-    let input = vec![
-        "acedgfb",
-        "cdfbe",
-        "gcdfa",
-        "fbcad",
-        "dab",
-        "cefabd",
-        "cdfgeb",
-        "eafb",
-        "cagedb",
-        "ab",
-    ];
+    let input = get_data();
+    let mut result = 0;
+    for (patterns, output) in input {
+        result += get_output(&patterns, &output);
+    }
 
-    let output = vec![
-        "cdfeb",
-        "fcadb",
-        "cdfeb",
-        "cdbaf",
-    ];
-
-    println!("{}", get_output(&input, &output));
-    return 0;
+    return result;
 }
 
 fn main() {
-    aoc::solution!(8, "count 1, 4, 7, 8", "");
+    aoc::solution!(8, "count 1, 4, 7, 8", "sum of output values");
 }
