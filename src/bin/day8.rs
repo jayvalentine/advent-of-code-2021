@@ -1,6 +1,8 @@
 // Advent of Code
 // Day 8
 
+use std::iter::FromIterator;
+
 #[cfg(test)]
 mod test_examples {
     use super::*;
@@ -163,7 +165,25 @@ mod test_digit {
 }
 
 fn digit(s: &str) -> Option<char> {
-    return Some('1');
+    // First sort the characters in the string so we can match
+    // against just a single pattern.
+    let mut chars: Vec<char> = s.chars().collect();
+    chars.sort();
+    let s = String::from_iter(chars);
+
+    return match s.as_str() {
+        "abcefg" => Some('0'),
+        "cf" => Some('1'),
+        "acdeg" => Some('2'),
+        "acdfg" => Some('3'),
+        "bcdf" => Some('4'),
+        "abdfg" => Some('5'),
+        "abdefg" => Some('6'),
+        "acf" => Some('7'),
+        "abcdefg" => Some('8'),
+        "abcdfg" => Some('9'),
+        _ => None
+    }
 }
 
 fn count_digits(segments: &[&str], digits: &[char]) -> u32 {
