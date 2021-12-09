@@ -10,6 +10,11 @@ mod test_puzzles {
     fn part1() {
         assert_eq!(524, super::part1());
     }
+
+    #[test]
+    fn part2() {
+        assert_eq!(1235430, super::part2());
+    }
 }
 
 #[cfg(test)]
@@ -174,14 +179,12 @@ fn get_basin(g: &Grid, starting_point: (usize, usize)) -> Vec<(usize, usize)> {
     let mut visited = Vec::new();
     let mut to_visit = Vec::new();
     to_visit.push(starting_point);
-    println!("get basin: ({}, {})", starting_point.0, starting_point.1);
 
     while to_visit.len() > 0 {
         // Next points to visit.
         let mut next_to_visit = Vec::new();
 
         for p in &to_visit {
-            println!("visited: ({}, {})", p.0, p.1);
             let val = g.get(p.0, p.1);
             if val != 9 {
                 if !visited.contains(p) {
@@ -221,19 +224,14 @@ fn part1() -> u32 {
 }
 
 fn part2() -> u32 {
-    let input = vec![
-        "2199943210",
-        "3987894921",
-        "9856789892",
-        "8767896789",
-        "9899965678",
-    ];
+    let grid = get_data();
+    let mut basins = get_basins(&grid);
+    basins.sort_by(|a, b| b.len().cmp(&a.len()));
 
-    let grid = get_grid(&mut input.iter());
-    let basins = get_basins(&grid);
-    return 0;
+    let result = basins[0].len() * basins[1].len() * basins[2].len();
+    return result as u32;
 }
 
 fn main() {
-    aoc::solution!(9, "# local minima", "");
+    aoc::solution!(9, "# local minima", "largest basins (product)");
 }
