@@ -85,6 +85,45 @@ impl Grid {
         return Grid { grid: rows };
     }
 
+    pub fn from_array(grid: Vec<Vec<u32>>) -> Grid {
+        return Grid { grid }
+    }
+
+    pub fn points(&self) -> Vec<(usize, usize)> {
+        let mut v = Vec::new();
+        let x_dim = self.grid[0].len();
+        let y_dim = self.grid.len();
+        for y in 0..y_dim {
+            for x in 0..x_dim {
+                v.push((x, y));
+            }
+        }
+        return v;
+    }
+
+    pub fn neighbours(&self, x: usize, y: usize) -> Vec<u32> {
+        let mut neighbours = Vec::new();
+        if x > 0 {
+            neighbours.push((x-1, y));
+        }
+        if y > 0 {
+            neighbours.push((x, y-1));
+        }
+        if x < (self.grid[0].len()-1) {
+            neighbours.push((x+1, y));
+        }
+        if y < (self.grid.len()-1) {
+            neighbours.push((x, y+1));
+        }
+
+        let mut v = Vec::new();
+        for (x, y) in neighbours {
+            v.push(self.get(x, y));
+        }
+
+        return v;
+    }
+
     pub fn set(&mut self, x: usize, y: usize, val: u32) {
         self.grid[y][x] = val;
     }
