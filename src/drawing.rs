@@ -101,7 +101,7 @@ impl Grid {
         return v;
     }
 
-    pub fn neighbours(&self, x: usize, y: usize) -> Vec<u32> {
+    pub fn neighbours(&self, x: usize, y: usize) -> Vec<(usize, usize)> {
         let mut neighbours = Vec::new();
         if x > 0 {
             neighbours.push((x-1, y));
@@ -116,12 +116,7 @@ impl Grid {
             neighbours.push((x, y+1));
         }
 
-        let mut v = Vec::new();
-        for (x, y) in neighbours {
-            v.push(self.get(x, y));
-        }
-
-        return v;
+        return neighbours;
     }
 
     pub fn set(&mut self, x: usize, y: usize, val: u32) {

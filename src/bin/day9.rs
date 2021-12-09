@@ -35,6 +35,63 @@ mod test_examples {
         assert_eq!(5, grid.get(local_minima[2].0, local_minima[2].1));
         assert_eq!(5, grid.get(local_minima[3].0, local_minima[3].1));
     }
+
+    #[test]
+    fn part2() {
+        let input = vec![
+            "2199943210",
+            "3987894921",
+            "9856789892",
+            "8767896789",
+            "9899965678",
+        ];
+
+        let grid = get_grid(&mut input.iter());
+        let basins = get_basins(&grid);
+
+        assert_eq!(4, basins.len());
+        assert_eq!(3, basins[0].len());
+        assert_eq!(9, basins[1].len());
+        assert_eq!(14, basins[2].len());
+        assert_eq!(9, basins[3].len());
+    }
+}
+
+#[cfg(test)]
+mod test_basins {
+    use super::*;
+
+    #[test]
+    fn top_left() {
+        let input = vec![
+            "2199943210",
+            "3987894921",
+            "9856789892",
+            "8767896789",
+            "9899965678",
+        ];
+
+        let grid = get_grid(&mut input.iter());
+        let basin = get_basin(&grid, (1, 0));
+
+        assert_eq!(3, basin.len());
+    }
+
+    #[test]
+    fn top_right() {
+        let input = vec![
+            "2199943210",
+            "3987894921",
+            "9856789892",
+            "8767896789",
+            "9899965678",
+        ];
+
+        let grid = get_grid(&mut input.iter());
+        let basin = get_basin(&grid, (9, 0));
+
+        assert_eq!(9, basin.len());
+    }
 }
 
 #[cfg(test)]
@@ -93,6 +150,7 @@ fn local_minima(g: &Grid) -> Vec<(usize, usize)> {
     for (x, y) in g.points() {
         let val = g.get(x, y);
         let neighbours = g.neighbours(x, y);
+        let neighbours: Vec<u32> = neighbours.iter().map(|n| g.get(n.0, n.1)).collect();
 
         if is_minimum(&val, &neighbours) {
             minima.push((x, y));
@@ -100,6 +158,50 @@ fn local_minima(g: &Grid) -> Vec<(usize, usize)> {
     }
 
     return minima;
+}
+
+fn get_basins(g: &Grid) -> Vec<Vec<(usize, usize)>> {
+    let minima = local_minima(g);
+    let mut basins = Vec::new();
+    for m in minima {
+        basins.push(get_basin(g, m));
+    }
+
+    return basins;
+}
+
+fn get_basin(g: &Grid, starting_point: (usize, usize)) -> Vec<(usize, usize)> {
+    let mut visited = Vec::new();
+    let mut to_visit = Vec::new();
+    to_visit.push(starting_point);
+    println!("get basin: ({}, {})", starting_point.0, starting_point.1);
+
+    while to_visit.len() > 0 {
+        // Next points to visit.
+        let mut next_to_visit = Vec::new();
+
+        for p in &to_visit {
+            println!("visited: ({}, {})", p.0, p.1);
+            let val = g.get(p.0, p.1);
+            if val != 9 {
+                if !visited.contains(p) {
+                    visited.push(*p);
+                }
+                
+                let neighbours = g.neighbours(p.0, p.1);
+                for n in neighbours {
+                    if !visited.contains(&n) {
+                        next_to_visit.push(n);
+                    }
+                }
+            }
+        }
+
+        to_visit.clear();
+        to_visit.append(&mut next_to_visit);
+    }
+
+    return visited;
 }
 
 fn get_data() -> Grid {
@@ -119,6 +221,16 @@ fn part1() -> u32 {
 }
 
 fn part2() -> u32 {
+    let input = vec![
+        "2199943210",
+        "3987894921",
+        "9856789892",
+        "8767896789",
+        "9899965678",
+    ];
+
+    let grid = get_grid(&mut input.iter());
+    let basins = get_basins(&grid);
     return 0;
 }
 
