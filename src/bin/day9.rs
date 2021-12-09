@@ -30,10 +30,10 @@ mod test_examples {
         let local_minima = local_minima(&grid);
 
         assert_eq!(4, local_minima.len());
-        assert_eq!(1, local_minima[0]);
-        assert_eq!(0, local_minima[1]);
-        assert_eq!(5, local_minima[2]);
-        assert_eq!(5, local_minima[3]);
+        assert_eq!(1, grid.get(local_minima[0].0, local_minima[0].1));
+        assert_eq!(0, grid.get(local_minima[1].0, local_minima[1].1));
+        assert_eq!(5, grid.get(local_minima[2].0, local_minima[2].1));
+        assert_eq!(5, grid.get(local_minima[3].0, local_minima[3].1));
     }
 }
 
@@ -87,7 +87,7 @@ fn get_grid(i: &mut Iter<&str>) -> Grid {
     return Grid::from_array(grid);
 }
 
-fn local_minima(g: &Grid) -> Vec<u32> {
+fn local_minima(g: &Grid) -> Vec<(usize, usize)> {
     let mut minima = Vec::new();
 
     for (x, y) in g.points() {
@@ -95,7 +95,7 @@ fn local_minima(g: &Grid) -> Vec<u32> {
         let neighbours = g.neighbours(x, y);
 
         if is_minimum(&val, &neighbours) {
-            minima.push(val);
+            minima.push((x, y));
         }
     }
 
@@ -112,7 +112,7 @@ fn part1() -> u32 {
     
     let mut risk_level = 0;
     for m in minima {
-        risk_level += m + 1;
+        risk_level += grid.get(m.0, m.1) + 1;
     }
 
     return risk_level;
