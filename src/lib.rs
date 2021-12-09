@@ -1,4 +1,5 @@
 pub mod data;
+pub mod drawing;
 
 use std::time::Instant;
 use std::fmt::Display;
