@@ -2,6 +2,7 @@
 // Day 9
 
 use core::slice::Iter;
+use std::cmp::Reverse;
 use aoc::drawing::{Grid, Point};
 
 #[cfg(test)]
@@ -177,8 +178,7 @@ fn get_basins(g: &Grid) -> Vec<Vec<Point>> {
 
 fn get_basin(g: &Grid, starting_point: Point) -> Vec<Point> {
     let mut visited = Vec::new();
-    let mut to_visit = Vec::new();
-    to_visit.push(starting_point);
+    let mut to_visit = vec![starting_point];
 
     while !to_visit.is_empty() {
         // Next points to visit.
@@ -226,7 +226,7 @@ fn part1() -> u32 {
 fn part2() -> u32 {
     let grid = get_data();
     let mut basins = get_basins(&grid);
-    basins.sort_by(|a, b| b.len().cmp(&a.len()));
+    basins.sort_by_key(|b| Reverse(b.len()));
 
     let result = basins[0].len() * basins[1].len() * basins[2].len();
     result as u32

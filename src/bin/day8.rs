@@ -406,18 +406,18 @@ fn get_segments(i: &mut Iter<&str>) -> Vec<(Vec<String>, Vec<String>)> {
     for line in i {
         let mut iter = line.split(" | ");
         let patterns = iter.next().expect("Parse ereor!");
-        let patterns = patterns.split_whitespace().map(|s| String::from(s)).collect();
+        let patterns = patterns.split_whitespace().map(String::from).collect();
         let output = iter.next().expect("Parse error!");
-        let output = output.split_whitespace().map(|s| String::from(s)).collect();
+        let output = output.split_whitespace().map(String::from).collect();
 
         v.push((patterns, output));
     }
 
-    return v;
+    v
 }
 
 fn get_data() -> Vec<(Vec<String>, Vec<String>)> {
-    return aoc::data::get_with_iter("data/day8.txt", &mut get_segments);
+    aoc::data::get_with_iter("data/day8.txt", &mut get_segments)
 }
 
 fn part1() -> u32 {
@@ -427,7 +427,7 @@ fn part1() -> u32 {
         outputs.append(&mut i.1);
     }
 
-    return count_segments(&outputs, &[2, 4, 3, 7]);
+    count_segments(&outputs, &[2, 4, 3, 7])
 }
 
 fn part2() -> u32 {
@@ -437,7 +437,7 @@ fn part2() -> u32 {
         result += get_output(&patterns, &output);
     }
 
-    return result;
+    result
 }
 
 fn main() {

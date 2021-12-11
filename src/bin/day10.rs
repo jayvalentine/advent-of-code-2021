@@ -291,8 +291,8 @@ fn part1() -> u32 {
     let mut score = 0;
     for i in input {
         let r = parse(&i);
-        if r.is_err() {
-            score += syntax_score(r.unwrap_err());
+        if let Err(e) = r {
+            score += syntax_score(e);
         }
     }
 
@@ -304,8 +304,8 @@ fn part2() -> u64 {
     let mut scores = Vec::new();
     for i in input {
         let a = autocomplete(&i);
-        if a.is_some() {
-            scores.push(autocomplete_score(&a.unwrap()))
+        if let Some(score) = a {
+            scores.push(autocomplete_score(&score))
         }
     }
 

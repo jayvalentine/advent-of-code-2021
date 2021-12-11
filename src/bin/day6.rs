@@ -102,9 +102,7 @@ fn next_pop(pop: Vec<u64>) -> Vec<u64> {
 
     let reproducing = pop[0];
 
-    for p in 0..8 {
-        new_pop[p] = pop[p+1];
-    }
+    new_pop[..8].clone_from_slice(&pop[1..9]);
 
     // Those that have reproduced tick over to 6,
     // and produce new fish with timer 8.

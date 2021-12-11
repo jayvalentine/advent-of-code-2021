@@ -191,12 +191,8 @@ fn overlapping_lines_without_diagonal(lines: &[Line]) -> u32 {
 }
 
 fn overlapping_lines(lines: &[Line]) -> u32 {
-    // Get maximum X and Y.
-    let max_x = max_x(lines);
-    let max_y = max_y(lines);
-
     // Create the grid.
-    let mut grid = Grid::new(max_x as usize, max_y as usize);
+    let mut grid = Grid::new();
 
     // For each line, plot on the grid.
     for line in lines {

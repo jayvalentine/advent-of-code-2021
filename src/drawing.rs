@@ -78,18 +78,12 @@ impl Point {
 }
 
 pub struct Grid {
-    xsize: usize,
-    ysize: usize,
     grid: HashMap<Point, u32>
 }
 
 impl Grid {
-    pub fn new(x_dim: usize, y_dim: usize) -> Grid {
-        Grid {
-            xsize: x_dim,
-            ysize: y_dim,
-            grid: HashMap::new()
-        }
+    pub fn new() -> Grid {
+        Grid { grid: HashMap::new() }
     }
 
     pub fn from_array(grid: Vec<Vec<u32>>) -> Grid {
@@ -105,11 +99,7 @@ impl Grid {
             y += 1;
         }
 
-        Grid {
-            xsize: x as usize,
-            ysize: y as usize,
-            grid: g
-        }
+        Grid { grid: g }
     }
 
     pub fn points(&self) -> Vec<Point> {
