@@ -81,7 +81,7 @@ mod test_segment {
         assert_eq!(2, seg2.len());
         assert!(seg2.possibles.contains(&'a'));
         assert!(seg2.possibles.contains(&'b'));
-        assert_eq!(false, seg2.possibles.contains(&'c'));
+        assert!(!seg2.possibles.contains(&'c'));
     }
 
     #[test]
@@ -89,8 +89,8 @@ mod test_segment {
         let seg = Segment::new("abc");
         let seg2 = seg.cannot_be("ab");
         assert_eq!(1, seg2.len());
-        assert_eq!(false, seg2.possibles.contains(&'a'));
-        assert_eq!(false, seg2.possibles.contains(&'b'));
+        assert!(!seg2.possibles.contains(&'a'));
+        assert!(!seg2.possibles.contains(&'b'));
         assert!(seg2.possibles.contains(&'c'));
     }
 }

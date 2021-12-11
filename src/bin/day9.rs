@@ -115,14 +115,14 @@ mod test_is_minimum {
     fn no_equal() {
         let v = 4;
         let n = vec![5, 4, 7, 10];
-        assert_eq!(false, is_minimum(&v, &n));
+        assert!(!is_minimum(&v, &n));
     }
 
     #[test]
     fn no_greater() {
         let v = 5;
         let n = vec![5, 4, 7, 10];
-        assert_eq!(false, is_minimum(&v, &n));
+        assert!(!is_minimum(&v, &n));
     }
 }
 

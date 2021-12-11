@@ -198,9 +198,9 @@ mod test_board {
         board.call(22);
 
         assert!(board.marks[1][2]);
-        assert_eq!(false, board.marks[0][0]);
-        assert_eq!(false, board.marks[2][1]);
-        assert_eq!(false, board.marks[1][3]);
+        assert!(!board.marks[0][0]);
+        assert!(!board.marks[2][1]);
+        assert!(!board.marks[1][3]);
     }
 
     #[test]
@@ -218,16 +218,16 @@ mod test_board {
         };
 
         board.call(22);
-        assert_eq!(false, board.bingo());
+        assert!(!board.bingo());
 
         board.call(33);
-        assert_eq!(false, board.bingo());
+        assert!(!board.bingo());
 
         board.call(55);
-        assert_eq!(false, board.bingo());
+        assert!(!board.bingo());
 
         board.call(11);
-        assert_eq!(false, board.bingo());
+        assert!(!board.bingo());
 
         board.call(44);
         assert!(board.bingo());
@@ -248,16 +248,16 @@ mod test_board {
         };
 
         board.call(1);
-        assert_eq!(false, board.bingo());
+        assert!(!board.bingo());
 
         board.call(99);
-        assert_eq!(false, board.bingo());
+        assert!(!board.bingo());
 
         board.call(12);
-        assert_eq!(false, board.bingo());
+        assert!(!board.bingo());
 
         board.call(44);
-        assert_eq!(false, board.bingo());
+        assert!(!board.bingo());
 
         board.call(10);
         assert!(board.bingo());
