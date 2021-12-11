@@ -108,7 +108,7 @@ mod test_is_minimum {
     fn yes() {
         let v = 4;
         let n = vec![5, 6, 7, 10];
-        assert_eq!(true, is_minimum(&v, &n));
+        assert!(is_minimum(&v, &n));
     }
 
     #[test]

@@ -197,7 +197,7 @@ mod test_board {
 
         board.call(22);
 
-        assert_eq!(true, board.marks[1][2]);
+        assert!(board.marks[1][2]);
         assert_eq!(false, board.marks[0][0]);
         assert_eq!(false, board.marks[2][1]);
         assert_eq!(false, board.marks[1][3]);
@@ -230,7 +230,7 @@ mod test_board {
         assert_eq!(false, board.bingo());
 
         board.call(44);
-        assert_eq!(true, board.bingo());
+        assert!(board.bingo());
     }
 
     #[test]
@@ -260,7 +260,7 @@ mod test_board {
         assert_eq!(false, board.bingo());
 
         board.call(10);
-        assert_eq!(true, board.bingo());
+        assert!(board.bingo());
     }
 }
 
