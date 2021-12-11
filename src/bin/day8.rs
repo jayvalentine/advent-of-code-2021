@@ -334,12 +334,10 @@ impl SegmentDisplay {
 
         let valid_combos = self.valid_combinations();
 
-        let mut val = 0;
-        for comb in valid_combos {
+        for (val, comb) in valid_combos.into_iter().enumerate() {
             if comb == lit {
-                return Some(val);
+                return Some(val as u32);
             }
-            val += 1;
         }
         return None;
     }
