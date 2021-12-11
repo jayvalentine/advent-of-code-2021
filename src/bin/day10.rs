@@ -88,6 +88,36 @@ mod test_autocomplete {
 }
 
 #[cfg(test)]
+mod test_autocomplete_score {
+    use super::*;
+
+    #[test]
+    fn a() {
+        assert_eq!(294, autocomplete_score("])}>"));
+    }
+
+    #[test]
+    fn b() {
+        assert_eq!(288957, autocomplete_score("}}]])})]"));
+    }
+
+    #[test]
+    fn c() {
+        assert_eq!(5566, autocomplete_score(")}>]})"));
+    }
+
+    #[test]
+    fn d() {
+        assert_eq!(1480781, autocomplete_score("}}>}>))))"));
+    }
+
+    #[test]
+    fn e() {
+        assert_eq!(995444, autocomplete_score("]]}}]}]}>"));
+    }
+}
+
+#[cfg(test)]
 mod test_parse {
     use super::*;
 
@@ -158,6 +188,23 @@ enum ChunkParseError {
     Incomplete(Vec<char>),
     Invalid(char),
     Imbalance
+}
+
+fn autocomplete_score(s: &str) -> u64 {
+    let mut score = 0;
+
+    for c in s.chars() {
+        score = score * 5;
+        score += match c {
+            ')' => 1,
+            ']' => 2,
+            '}' => 3,
+            '>' => 4,
+            _ => unreachable!()
+        }
+    }
+
+    return score;
 }
 
 fn autocomplete(s: &str) -> Option<String> {
@@ -252,10 +299,21 @@ fn part1() -> u32 {
     return score;
 }
 
-fn part2() -> u32 {
-    return 0;
+fn part2() -> u64 {
+    let input: Vec<String> = data::get("data/day10.txt");
+    let mut scores = Vec::new();
+    for i in input {
+        let a = autocomplete(&i);
+        if a.is_some() {
+            scores.push(autocomplete_score(&a.unwrap()))
+        }
+    }
+
+    // Sort scores, select the middle.
+    scores.sort();
+    return scores[scores.len() / 2];
 }
 
 fn main() {
-    aoc::solution!(10, "syntax error score", "");
+    aoc::solution!(10, "syntax error score", "autocomplete score");
 }
