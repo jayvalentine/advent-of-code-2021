@@ -1,6 +1,9 @@
 // Implementations relating to drawing.
 
+use std::cmp::Ordering;
+use std::hash::Hash;
 use std::str::FromStr;
+use std::collections::HashMap;
 
 #[cfg(test)]
 mod test_parse_point {
@@ -39,10 +42,10 @@ pub enum PointParseError {
     NotNumberY
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Point {
-    pub x: i64,
-    pub y: i64
+    pub y: i64,
+    pub x: i64
 }
 
 impl FromStr for Point {
@@ -69,72 +72,80 @@ impl FromStr for Point {
     }
 }
 
+impl Point {
+    pub fn new(x: i64, y: i64) -> Point {
+        return Point { x, y }
+    }
+}
 
 pub struct Grid {
-    grid: Vec<Vec<u32>>
+    grid: HashMap<Point, u32>
 }
 
 impl Grid {
-    pub fn new(x: usize, y: usize) -> Grid {
-        let mut rows = Vec::new();
-        for _ in 0..(y+1) {
-            let row = vec![0; x+1];
-            rows.push(row);
+    pub fn new(x_dim: i64, y_dim: i64) -> Grid {
+        let mut grid = HashMap::new();
+        for y in 0..(y_dim+1) {
+            for x in 0..(x_dim+1) {
+                grid.insert(Point::new(x, y), 0);
+            }
         }
 
-        return Grid { grid: rows };
+        return Grid { grid };
     }
 
     pub fn from_array(grid: Vec<Vec<u32>>) -> Grid {
-        return Grid { grid }
-    }
-
-    pub fn points(&self) -> Vec<(usize, usize)> {
-        let mut v = Vec::new();
-        let x_dim = self.grid[0].len();
-        let y_dim = self.grid.len();
-        for y in 0..y_dim {
-            for x in 0..x_dim {
-                v.push((x, y));
+        let mut g = HashMap::new();
+        let mut y = 0;
+        for row in grid {
+            let mut x = 0;
+            for v in row {
+                g.insert(Point::new(x, y), v);
+                x += 1;
             }
+            y += 1;
         }
-        return v;
+
+        return Grid { grid: g }
     }
 
-    pub fn neighbours(&self, x: usize, y: usize) -> Vec<(usize, usize)> {
-        let mut neighbours = Vec::new();
-        if x > 0 {
-            neighbours.push((x-1, y));
-        }
-        if y > 0 {
-            neighbours.push((x, y-1));
-        }
-        if x < (self.grid[0].len()-1) {
-            neighbours.push((x+1, y));
-        }
-        if y < (self.grid.len()-1) {
-            neighbours.push((x, y+1));
-        }
-
-        return neighbours;
+    pub fn points(&self) -> Vec<Point> {
+        let mut p: Vec<Point> = self.grid.keys().map(|p| *p).collect();
+        p.sort();
+        return p;
     }
 
-    pub fn set(&mut self, x: usize, y: usize, val: u32) {
-        self.grid[y][x] = val;
+    pub fn neighbours(&self, p: &Point) -> Vec<Point> {
+        let x = p.x;
+        let y = p.y;
+        let neighbours = vec![
+            Point::new(x-1, y),
+            Point::new(x, y-1),
+            Point::new(x+1, y),
+            Point::new(x, y+1),
+        ];
+
+        return neighbours.iter().filter(|p| self.grid.contains_key(&p))
+                         .map(|p| *p).collect();
     }
 
-    pub fn get(&self, x: usize, y: usize) -> u32 {
-        return self.grid[y][x];
+    pub fn set(&mut self, p: Point, val: u32) {
+        self.grid.insert(p, val);
+    }
+
+    pub fn get(&self, p: &Point) -> Option<u32> {
+        return match self.grid.get(p) {
+            Some(v) => Some(*v),
+            None => None
+        }
     }
 
     // Counts the number of grid squares for which the predicate is true.
     pub fn count(&self, f: &dyn Fn(u32) -> bool) -> u32 {
         let mut count = 0;
 
-        for row in &self.grid {
-            for col in row {
-                if f(*col) { count += 1; }
-            }
+        for (_, v) in &self.grid {
+            if f(*v) { count += 1; }
         }
         
         return count;

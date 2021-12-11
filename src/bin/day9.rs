@@ -2,7 +2,7 @@
 // Day 9
 
 use core::slice::Iter;
-use aoc::drawing::Grid;
+use aoc::drawing::{Grid, Point};
 
 #[cfg(test)]
 mod test_puzzles {
@@ -35,10 +35,10 @@ mod test_examples {
         let local_minima = local_minima(&grid);
 
         assert_eq!(4, local_minima.len());
-        assert_eq!(1, grid.get(local_minima[0].0, local_minima[0].1));
-        assert_eq!(0, grid.get(local_minima[1].0, local_minima[1].1));
-        assert_eq!(5, grid.get(local_minima[2].0, local_minima[2].1));
-        assert_eq!(5, grid.get(local_minima[3].0, local_minima[3].1));
+        assert_eq!(1, grid.get(&local_minima[0]).expect("expected value"));
+        assert_eq!(0, grid.get(&local_minima[1]).expect("expected value"));
+        assert_eq!(5, grid.get(&local_minima[2]).expect("expected value"));
+        assert_eq!(5, grid.get(&local_minima[3]).expect("expected value"));
     }
 
     #[test]
@@ -77,7 +77,7 @@ mod test_basins {
         ];
 
         let grid = get_grid(&mut input.iter());
-        let basin = get_basin(&grid, (1, 0));
+        let basin = get_basin(&grid, Point::new(1, 0));
 
         assert_eq!(3, basin.len());
     }
@@ -93,7 +93,7 @@ mod test_basins {
         ];
 
         let grid = get_grid(&mut input.iter());
-        let basin = get_basin(&grid, (9, 0));
+        let basin = get_basin(&grid, Point::new(9, 0));
 
         assert_eq!(9, basin.len());
     }
@@ -149,23 +149,23 @@ fn get_grid(i: &mut Iter<&str>) -> Grid {
     return Grid::from_array(grid);
 }
 
-fn local_minima(g: &Grid) -> Vec<(usize, usize)> {
+fn local_minima(g: &Grid) -> Vec<Point> {
     let mut minima = Vec::new();
 
-    for (x, y) in g.points() {
-        let val = g.get(x, y);
-        let neighbours = g.neighbours(x, y);
-        let neighbours: Vec<u32> = neighbours.iter().map(|n| g.get(n.0, n.1)).collect();
+    for p in g.points() {
+        let val = g.get(&p).expect("invalid point");
+        let neighbours = g.neighbours(&p);
+        let neighbours: Vec<u32> = neighbours.iter().map(|n| g.get(n).expect("invalid point")).collect();
 
         if is_minimum(&val, &neighbours) {
-            minima.push((x, y));
+            minima.push(p);
         }
     }
 
     return minima;
 }
 
-fn get_basins(g: &Grid) -> Vec<Vec<(usize, usize)>> {
+fn get_basins(g: &Grid) -> Vec<Vec<Point>> {
     let minima = local_minima(g);
     let mut basins = Vec::new();
     for m in minima {
@@ -175,7 +175,7 @@ fn get_basins(g: &Grid) -> Vec<Vec<(usize, usize)>> {
     return basins;
 }
 
-fn get_basin(g: &Grid, starting_point: (usize, usize)) -> Vec<(usize, usize)> {
+fn get_basin(g: &Grid, starting_point: Point) -> Vec<Point> {
     let mut visited = Vec::new();
     let mut to_visit = Vec::new();
     to_visit.push(starting_point);
@@ -185,13 +185,13 @@ fn get_basin(g: &Grid, starting_point: (usize, usize)) -> Vec<(usize, usize)> {
         let mut next_to_visit = Vec::new();
 
         for p in &to_visit {
-            let val = g.get(p.0, p.1);
+            let val = g.get(&p).expect("invalid point");
             if val != 9 {
                 if !visited.contains(p) {
                     visited.push(*p);
                 }
                 
-                let neighbours = g.neighbours(p.0, p.1);
+                let neighbours = g.neighbours(&p);
                 for n in neighbours {
                     if !visited.contains(&n) {
                         next_to_visit.push(n);
@@ -217,7 +217,7 @@ fn part1() -> u32 {
     
     let mut risk_level = 0;
     for m in minima {
-        risk_level += grid.get(m.0, m.1) + 1;
+        risk_level += grid.get(&m).expect("invalid point") + 1;
     }
 
     return risk_level;
