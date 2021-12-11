@@ -1,7 +1,7 @@
 // Advent of Code
 // Day 7
 
-use aoc;
+
 use aoc::data;
 
 #[cfg(test)]
@@ -48,15 +48,15 @@ fn max_pos(crabs: &[i32]) -> i32 {
         }
     }
 
-    return pos;
+    pos
 }
 
 fn min_fuel_position_linear(crabs: &[i32]) -> (i32, i32) {
-    return min_fuel_position(crabs, &|dist| dist);
+    min_fuel_position(crabs, &|dist| dist)
 }
 
 fn min_fuel_position_increasing(crabs: &[i32]) -> (i32, i32) {
-    return min_fuel_position(crabs, &|dist| ((dist) * (dist+1)) / 2);
+    min_fuel_position(crabs, &|dist| ((dist) * (dist+1)) / 2)
 }
 
 fn min_fuel_position(crabs: &[i32], f_pos: &dyn Fn(i32) -> i32) -> (i32, i32) {
@@ -78,7 +78,7 @@ fn min_fuel_position(crabs: &[i32], f_pos: &dyn Fn(i32) -> i32) -> (i32, i32) {
         }
     }
 
-    return (min_pos, min);
+    (min_pos, min)
 }
 
 fn get_data() -> Vec<i32> {
@@ -86,19 +86,19 @@ fn get_data() -> Vec<i32> {
         data::from_separated(iter.next().expect("Data parse error!"), ',').expect("Data parse error!")
     );
 
-    return v;
+    v
 }
 
 fn part1() -> i32 {
     let crabs = get_data();
     let (_position, fuel) = min_fuel_position_linear(&crabs);
-    return fuel;
+    fuel
 }
 
 fn part2() -> i32 {
     let crabs = get_data();
     let (_position, fuel) = min_fuel_position_increasing(&crabs);
-    return fuel;
+    fuel
 }
 
 fn main() {

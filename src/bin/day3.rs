@@ -150,7 +150,7 @@ fn most_common(input: &[u32], width: usize) -> (Vec<u32>, Vec<u32>) {
         }
     }
 
-    return (count_ones, count_zeros);
+    (count_ones, count_zeros)
 }
 
 fn find_rates(input: &[u32], width: usize) -> Rates {
@@ -178,14 +178,14 @@ fn find_rates(input: &[u32], width: usize) -> Rates {
 
     let epsilon = epsilon & mask;
 
-    return Rates { gamma, epsilon }
+    Rates { gamma, epsilon }
 }
 
 fn find_rates_life_support(input: &[u32], width: usize) -> LifeSupportRates {
     let oxygen = find_rates_oxygen(input, width);
     let co2 = find_rates_co2(input, width);
 
-    return LifeSupportRates { oxygen, co2 };
+    LifeSupportRates { oxygen, co2 }
 }
 
 fn find_rates_with_closure(input: &[u32], width: usize, f: &dyn Fn(u32, u32) -> bool) -> u32 {
@@ -214,27 +214,27 @@ fn find_rates_with_closure(input: &[u32], width: usize, f: &dyn Fn(u32, u32) -> 
         return selected[0];
     }
 
-    return find_rates_with_closure(&selected, width-1, f);
+    find_rates_with_closure(&selected, width-1, f)
 }
 
 fn find_rates_oxygen(input: &[u32], width: usize) -> u32 {
-    return find_rates_with_closure(input, width, &|x, y| x >= y);
+    find_rates_with_closure(input, width, &|x, y| x >= y)
 }
 
 fn find_rates_co2(input: &[u32], width: usize) -> u32 {
-    return find_rates_with_closure(input, width, &|x, y| x < y);
+    find_rates_with_closure(input, width, &|x, y| x < y)
 }
 
 fn part1() -> u32 {
     let input = data::get_with("data/day3.txt", &|s| u32::from_str_radix(s, 2)).expect("Error parsing input!");
     let rates = find_rates(&input, 12);
-    return rates.epsilon * rates.gamma;
+    rates.epsilon * rates.gamma
 }
 
 fn part2() -> u32 {
     let input = data::get_with("data/day3.txt", &|s| u32::from_str_radix(s, 2)).expect("Error parsing input!");
     let rates = find_rates_life_support(&input, 12);
-    return rates.oxygen * rates.co2;
+    rates.oxygen * rates.co2
 }
 
 fn main() {

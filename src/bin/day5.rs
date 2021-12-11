@@ -147,7 +147,7 @@ impl FromStr for Line {
             Err(_) => return Err(LineParseError::BadSyntax)
         };
 
-        return Ok(Line { p1, p2 });
+        Ok(Line { p1, p2 })
     }
 }
 
@@ -158,7 +158,7 @@ fn max_x(lines: &[Line]) -> i64 {
         if l.p2.x > x { x = l.p2.x }
     }
 
-    return x;
+    x
 }
 
 fn max_y(lines: &[Line]) -> i64 {
@@ -168,7 +168,7 @@ fn max_y(lines: &[Line]) -> i64 {
         if l.p2.y > y { y = l.p2.y }
     }
 
-    return y;
+    y
 }
 
 fn exclude_diagonal(lines: &[Line]) -> Vec<Line> {
@@ -180,14 +180,14 @@ fn exclude_diagonal(lines: &[Line]) -> Vec<Line> {
         }
     }
 
-    return v;
+    v
 }
 
 fn overlapping_lines_without_diagonal(lines: &[Line]) -> u32 {
-    let lines = exclude_diagonal(&lines);
+    let lines = exclude_diagonal(lines);
 
     // Return number of squares with more than one line.
-    return overlapping_lines(&lines);
+    overlapping_lines(&lines)
 }
 
 fn overlapping_lines(lines: &[Line]) -> u32 {
@@ -238,19 +238,19 @@ fn overlapping_lines(lines: &[Line]) -> u32 {
     }
 
     // Return number of squares with more than one line.
-    return grid.count(&|n| n > 1);
+    grid.count(&|n| n > 1)
 }
 
 fn part1() -> u32 {
     let input = data::get("data/day5.txt");
 
-    return overlapping_lines_without_diagonal(&input);
+    overlapping_lines_without_diagonal(&input)
 }
 
 fn part2() -> u32 {
     let input = data::get("data/day5.txt");
 
-    return overlapping_lines(&input);
+    overlapping_lines(&input)
 }
 
 fn main() {

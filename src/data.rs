@@ -9,21 +9,21 @@ pub fn get<T: FromStr>(file: &str) -> Vec<T> {
     let mut input: Vec<T> = Vec::new();
 
     // Read test data in, iterate over each line.
-    let f = File::open(file).expect(&format!("Could not open {}", file));
+    let f = File::open(file).unwrap_or_else(|_| panic!("Could not open {}", file));
     let reader = BufReader::new(f);
 
     for line in reader.lines() {
-        let line = line.expect(&format!("Invalid line in {}", file));
+        let line = line.unwrap_or_else(|_| panic!("Invalid line in {}", file));
 
         let n = match T::from_str(line.trim()) {
             Ok(v) => v,
-            Err(_) => panic!(format!("Parse error in {}", file))
+            Err(_) => panic!("Parse error in {}", file)
         };
 
         input.push(n);
     }
 
-    return input;
+    input
 }
 
 // Returns a vector of the objects constructed from the given function for each line of a file.
@@ -31,29 +31,29 @@ pub fn get_with<T: FromStr>(file: &str, func: &dyn Fn(&str) -> Result<T, T::Err>
     let mut input: Vec<T> = Vec::new();
 
     // Read test data in, iterate over each line.
-    let f = File::open(file).expect(&format!("Could not open {}", file));
+    let f = File::open(file).unwrap_or_else(|_| panic!("Could not open {}", file));
     let reader = BufReader::new(f);
 
     for line in reader.lines() {
-        let line = line.expect(&format!("Invalid line in {}", file));
+        let line = line.unwrap_or_else(|_| panic!("Invalid line in {}", file));
 
         let n = func(line.trim())?;
 
         input.push(n);
     }
 
-    return Ok(input);
+    Ok(input)
 }
 
 pub fn get_with_iter<T>(file: &str, f_iter: &mut dyn Fn(&mut Iter<&str>) -> T) -> T {
     let mut input = Vec::new();
 
     // Read test data in, iterate over each line.
-    let f = File::open(file).expect(&format!("Could not open {}", file));
+    let f = File::open(file).unwrap_or_else(|_| panic!("Could not open {}", file));
     let reader = BufReader::new(f);
 
     for line in reader.lines() {
-        let line = line.expect(&format!("Invalid line in {}", file));
+        let line = line.unwrap_or_else(|_| panic!("Invalid line in {}", file));
 
         input.push(line);
     }
@@ -69,5 +69,5 @@ pub fn from_separated<T: FromStr>(s: &str, sep: char) -> Result<Vec<T>, T::Err> 
         v.push(T::from_str(i)?)
     }
 
-    return Ok(v);
+    Ok(v)
 }

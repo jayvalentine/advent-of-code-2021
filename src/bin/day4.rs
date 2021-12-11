@@ -291,11 +291,11 @@ impl BingoBoard {
             }
         }
 
-        return BingoBoard { grid, marks: [[false; 5]; 5] }
+        BingoBoard { grid, marks: [[false; 5]; 5] }
     }
 
     fn cell(&self, x: usize, y: usize) -> u32 {
-        return self.grid[y][x];
+        self.grid[y][x]
     }
 
     fn call(&mut self, n: u32) {
@@ -336,7 +336,7 @@ impl BingoBoard {
             }
         }
 
-        return false;
+        false
     }
 
     fn score(&self) -> u32 {
@@ -349,7 +349,7 @@ impl BingoBoard {
             }
         }
 
-        return score;
+        score
     }
 }
 
@@ -360,7 +360,7 @@ fn parse_calls(iter: &mut Iter<&str>) -> Vec<u32> {
     for call in calls_str.split(',') {
         calls.push(call.parse().expect("Non-number in call!"));
     }
-    return calls;
+    calls
 }
 
 fn play_bingo(calls: &[u32], boards: &mut [BingoBoard]) -> u32 {
@@ -412,25 +412,25 @@ fn get_boards_and_calls(iter: &mut Iter<&str>) -> (Vec<u32>, Vec<BingoBoard>) {
         boards.push(BingoBoard::parse(iter));
     }
 
-    return (calls, boards);
+    (calls, boards)
 }
 
 fn get_data() -> (Vec<u32>, Vec<BingoBoard>) {
-    return data::get_with_iter("data/day4.txt", &mut get_boards_and_calls);
+    data::get_with_iter("data/day4.txt", &mut get_boards_and_calls)
 }
 
 fn part1() -> u32 {
     let (calls, mut boards) = get_data();
 
-    let score = play_bingo(&calls, &mut boards);
-    return score;
+    
+    play_bingo(&calls, &mut boards)
 }
 
 fn part2() -> u32 {
     let (calls, mut boards) = get_data();
 
-    let score = play_bingo_last_winner(&calls, &mut boards);
-    return score;
+    
+    play_bingo_last_winner(&calls, &mut boards)
 }
 
 fn main() {

@@ -132,7 +132,7 @@ fn is_minimum(v: &u32, n: &[u32]) -> bool {
         }
     }
 
-    return true;
+    true
 }
 
 fn get_grid(i: &mut Iter<&str>) -> Grid {
@@ -146,7 +146,7 @@ fn get_grid(i: &mut Iter<&str>) -> Grid {
         grid.push(v);
     }
 
-    return Grid::from_array(grid);
+    Grid::from_array(grid)
 }
 
 fn local_minima(g: &Grid) -> Vec<Point> {
@@ -162,7 +162,7 @@ fn local_minima(g: &Grid) -> Vec<Point> {
         }
     }
 
-    return minima;
+    minima
 }
 
 fn get_basins(g: &Grid) -> Vec<Vec<Point>> {
@@ -172,7 +172,7 @@ fn get_basins(g: &Grid) -> Vec<Vec<Point>> {
         basins.push(get_basin(g, m));
     }
 
-    return basins;
+    basins
 }
 
 fn get_basin(g: &Grid, starting_point: Point) -> Vec<Point> {
@@ -180,18 +180,18 @@ fn get_basin(g: &Grid, starting_point: Point) -> Vec<Point> {
     let mut to_visit = Vec::new();
     to_visit.push(starting_point);
 
-    while to_visit.len() > 0 {
+    while !to_visit.is_empty() {
         // Next points to visit.
         let mut next_to_visit = Vec::new();
 
         for p in &to_visit {
-            let val = g.get(&p);
+            let val = g.get(p);
             if val != 9 {
                 if !visited.contains(p) {
                     visited.push(*p);
                 }
                 
-                let neighbours = g.neighbours(&p);
+                let neighbours = g.neighbours(p);
                 for n in neighbours {
                     if !visited.contains(&n) {
                         next_to_visit.push(n);
@@ -204,11 +204,11 @@ fn get_basin(g: &Grid, starting_point: Point) -> Vec<Point> {
         to_visit.append(&mut next_to_visit);
     }
 
-    return visited;
+    visited
 }
 
 fn get_data() -> Grid {
-    return aoc::data::get_with_iter("data/day9.txt", &mut get_grid);
+    aoc::data::get_with_iter("data/day9.txt", &mut get_grid)
 }
 
 fn part1() -> u32 {
@@ -220,7 +220,7 @@ fn part1() -> u32 {
         risk_level += grid.get(&m) + 1;
     }
 
-    return risk_level;
+    risk_level
 }
 
 fn part2() -> u32 {
@@ -229,7 +229,7 @@ fn part2() -> u32 {
     basins.sort_by(|a, b| b.len().cmp(&a.len()));
 
     let result = basins[0].len() * basins[1].len() * basins[2].len();
-    return result as u32;
+    result as u32
 }
 
 fn main() {

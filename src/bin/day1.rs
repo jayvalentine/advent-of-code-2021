@@ -180,11 +180,11 @@ fn num_increases(report: &[u32]) -> u32 {
     let mut increases = 0;
 
     for depth in report {
-        if depth > &previous { increases = increases + 1; }
+        if depth > &previous { increases += 1; }
         previous = *depth;
     }
 
-    return increases;
+    increases
 }
 
 fn num_increases_sliding_window(report: &[u32]) -> u32 {
@@ -192,23 +192,23 @@ fn num_increases_sliding_window(report: &[u32]) -> u32 {
 
     for i in 2..report.len() {
         let range = &report[i-2..i+1];
-        let sum = range.iter().fold(0, |acc, x| acc + x);
+        let sum = range.iter().sum();
         sums.push(sum);
     }
 
-    return num_increases(&sums);
+    num_increases(&sums)
 }
 
 fn part1() -> u32 {
     let input = data::get("data/day1.txt");
 
-    return num_increases(&input);
+    num_increases(&input)
 }
 
 fn part2() -> u32 {
     let input = data::get("data/day1.txt");
 
-    return num_increases_sliding_window(&input);
+    num_increases_sliding_window(&input)
 }
 
 fn main() {

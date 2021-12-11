@@ -67,13 +67,13 @@ impl FromStr for Point {
             Result::Err(_) => return Result::Err(PointParseError::NotNumberY)
         };
 
-        return Ok(Point { x, y });
+        Ok(Point { x, y })
     }
 }
 
 impl Point {
     pub fn new(x: i64, y: i64) -> Point {
-        return Point { x, y }
+        Point { x, y }
     }
 }
 
@@ -85,11 +85,11 @@ pub struct Grid {
 
 impl Grid {
     pub fn new(x_dim: usize, y_dim: usize) -> Grid {
-        return Grid {
+        Grid {
             xsize: x_dim,
             ysize: y_dim,
             grid: HashMap::new()
-        };
+        }
     }
 
     pub fn from_array(grid: Vec<Vec<u32>>) -> Grid {
@@ -105,7 +105,7 @@ impl Grid {
             y += 1;
         }
 
-        return Grid {
+        Grid {
             xsize: x as usize,
             ysize: y as usize,
             grid: g
@@ -113,13 +113,13 @@ impl Grid {
     }
 
     pub fn points(&self) -> Vec<Point> {
-        let mut p: Vec<Point> = self.grid.keys().map(|p| *p).collect();
+        let mut p: Vec<Point> = self.grid.keys().copied().collect();
         p.sort();
-        return p;
+        p
     }
 
     pub fn len(&self) -> usize {
-        return self.points().len();
+        self.points().len()
     }
 
     pub fn neighbours(&self, p: &Point) -> Vec<Point> {
@@ -132,8 +132,7 @@ impl Grid {
             Point::new(x, y+1),
         ];
 
-        return neighbours.iter().filter(|p| self.grid.contains_key(&p))
-                         .map(|p| *p).collect();
+        return neighbours.iter().filter(|p| self.grid.contains_key(p)).copied().collect();
     }
 
     pub fn neighbours_diagonal(&self, p: &Point) -> Vec<Point> {
@@ -146,8 +145,7 @@ impl Grid {
         neighbours.push(Point::new(x+1, y-1));
         neighbours.push(Point::new(x+1, y+1));
 
-        return neighbours.iter().filter(|p| self.grid.contains_key(&p))
-                         .map(|p| *p).collect();
+        return neighbours.iter().filter(|p| self.grid.contains_key(p)).copied().collect();
     }
 
     pub fn set(&mut self, p: &Point, val: u32) {
@@ -184,6 +182,6 @@ impl Grid {
             if f(*v) { count += 1; }
         }
         
-        return count;
+        count
     }
 }

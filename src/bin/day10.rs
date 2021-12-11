@@ -194,7 +194,7 @@ fn autocomplete_score(s: &str) -> u64 {
     let mut score = 0;
 
     for c in s.chars() {
-        score = score * 5;
+        score *= 5;
         score += match c {
             ')' => 1,
             ']' => 2,
@@ -204,7 +204,7 @@ fn autocomplete_score(s: &str) -> u64 {
         }
     }
 
-    return score;
+    score
 }
 
 fn autocomplete(s: &str) -> Option<String> {
@@ -223,13 +223,13 @@ fn autocomplete(s: &str) -> Option<String> {
 
 // Given a LHS character, returns the expected RHS character.
 fn expected_rhs(c: char) -> char {
-    return match c {
+    match c {
         '(' => ')',
         '[' => ']',
         '<' => '>',
         '{' => '}',
         _ => unreachable!()
-    };
+    }
 }
 
 fn parse(s: &str) -> Result<(), ChunkParseError> {
@@ -265,16 +265,16 @@ fn parse(s: &str) -> Result<(), ChunkParseError> {
 
     // If we reach end of input and the stack is not empty,
     // we've got an incomplete chunk.
-    if stack.len() > 0 {
+    if !stack.is_empty() {
         return Err(ChunkParseError::Incomplete(stack));
     }
 
     // We've not seen any errors, so it's a valid chunk!
-    return Ok(());
+    Ok(())
 }
 
 fn syntax_score(e: ChunkParseError) -> u32 {
-    return match e {
+    match e {
         ChunkParseError::Mismatch(_, c) => match c {
             ')' => 3,
             ']' => 57,
@@ -296,7 +296,7 @@ fn part1() -> u32 {
         }
     }
 
-    return score;
+    score
 }
 
 fn part2() -> u64 {
@@ -310,8 +310,8 @@ fn part2() -> u64 {
     }
 
     // Sort scores, select the middle.
-    scores.sort();
-    return scores[scores.len() / 2];
+    scores.sort_unstable();
+    scores[scores.len() / 2]
 }
 
 fn main() {

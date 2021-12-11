@@ -111,7 +111,7 @@ fn next_pop(pop: Vec<u64>) -> Vec<u64> {
     new_pop[6] += reproducing;
     new_pop[8] += reproducing;
 
-    return new_pop;
+    new_pop
 }
 
 fn lanternfish_pop(initial_pop: &[u32], days: u32) -> u64 {
@@ -124,7 +124,7 @@ fn lanternfish_pop(initial_pop: &[u32], days: u32) -> u64 {
         population = next_pop(population);
     }
 
-    return population.iter().fold(0, |acc, x| acc + x);
+    return population.iter().sum();
 }
 
 fn get_data() -> Vec<u32> {
@@ -132,17 +132,17 @@ fn get_data() -> Vec<u32> {
         data::from_separated(iter.next().expect("Data parse error!"), ',').expect("Data parse error!")
     );
 
-    return v;
+    v
 }
 
 fn part1() -> u64 {
     let initial_pop = get_data();
-    return lanternfish_pop(&initial_pop, 80);
+    lanternfish_pop(&initial_pop, 80)
 }
 
 fn part2() -> u64 {
     let initial_pop = get_data();
-    return lanternfish_pop(&initial_pop, 256);
+    lanternfish_pop(&initial_pop, 256)
 }
 
 fn main() {

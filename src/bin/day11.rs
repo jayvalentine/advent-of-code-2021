@@ -144,7 +144,7 @@ fn get_grid(i: &mut Iter<&str>) -> Grid {
         grid.push(v);
     }
 
-    return Grid::from_array(grid);
+    Grid::from_array(grid)
 }
 
 fn step(grid: &mut Grid) -> u64 {
@@ -167,7 +167,7 @@ fn step(grid: &mut Grid) -> u64 {
         let mut new_flashes = HashSet::new();
 
         for flash in &iter_flashes {
-            let neighbours = grid.neighbours_diagonal(&flash);
+            let neighbours = grid.neighbours_diagonal(flash);
             for n in neighbours {
                 let new_v = grid.get(&n) + 1;
                 grid.set(&n, new_v);
@@ -184,7 +184,7 @@ fn step(grid: &mut Grid) -> u64 {
             }
         }
 
-        if new_flashes.len() == 0 { break; }
+        if new_flashes.is_empty() { break; }
         count_flashes += new_flashes.len();
 
         iter_flashes = new_flashes;
@@ -194,7 +194,7 @@ fn step(grid: &mut Grid) -> u64 {
         grid.set(f, 0);
     }
 
-    return count_flashes as u64;
+    count_flashes as u64
 }
 
 fn total_flashes(grid: &mut Grid) -> u64 {
@@ -202,7 +202,7 @@ fn total_flashes(grid: &mut Grid) -> u64 {
     for _ in 0..100 {
         flashes += step(grid);
     }
-    return flashes;
+    flashes
 }
 
 fn first_synchronized_flash(grid: &mut Grid) -> u64 {
@@ -218,17 +218,17 @@ fn first_synchronized_flash(grid: &mut Grid) -> u64 {
 }
 
 fn get_data() -> Grid {
-    return aoc::data::get_with_iter("data/day11.txt", &mut get_grid);
+    aoc::data::get_with_iter("data/day11.txt", &mut get_grid)
 }
 
 fn part1() -> u64 {
     let mut grid = get_data();
-    return total_flashes(&mut grid);
+    total_flashes(&mut grid)
 }
 
 fn part2() -> u64 {
     let mut grid = get_data();
-    return first_synchronized_flash(&mut grid);
+    first_synchronized_flash(&mut grid)
 }
 
 fn main() {

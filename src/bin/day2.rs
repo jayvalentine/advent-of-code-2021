@@ -34,7 +34,7 @@ mod test_examples {
 
         let mut commands: Vec<Command> = Vec::new();
         for s in input {
-            commands.push(Command::from_str(&s).expect("Could not parse command!"));
+            commands.push(Command::from_str(s).expect("Could not parse command!"));
         }
 
         let position = final_position(&commands);
@@ -56,7 +56,7 @@ mod test_examples {
 
         let mut commands: Vec<Command> = Vec::new();
         for s in input {
-            commands.push(Command::from_str(&s).expect("Could not parse command!"));
+            commands.push(Command::from_str(s).expect("Could not parse command!"));
         }
 
         let position = final_position_with_aim(&commands);
@@ -202,10 +202,10 @@ impl FromStr for Direction {
     type Err = DirectionError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if s == "down" { return Ok(Direction::Down); }
-        else if s == "up" { return Ok(Direction::Up); }
-        else if s == "forward" { return Ok(Direction::Forward); }
-        else { return Err(DirectionError::BadDirection); }
+        if s == "down" { Ok(Direction::Down) }
+        else if s == "up" { Ok(Direction::Up) }
+        else if s == "forward" { Ok(Direction::Forward) }
+        else { Err(DirectionError::BadDirection) }
     }
 }
 
@@ -227,10 +227,10 @@ impl FromStr for Command {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut split = s.split_whitespace();
-        let dir_str = split.nth(0).ok_or(CommandError::BadCommand)?;
-        let val_str = split.nth(0).ok_or(CommandError::BadValue)?;
+        let dir_str = split.next().ok_or(CommandError::BadCommand)?;
+        let val_str = split.next().ok_or(CommandError::BadValue)?;
 
-        let dir = match Direction::from_str(&dir_str) {
+        let dir = match Direction::from_str(dir_str) {
             Ok(d) => d,
             Err(_) => return Err(CommandError::BadCommand)
         };
@@ -245,7 +245,7 @@ impl FromStr for Command {
             val
         };
 
-        return Ok(command);
+        Ok(command)
     }
 }
 
@@ -260,7 +260,7 @@ fn final_position(commands: &[Command]) -> Position {
         };
     }
 
-    return pos;
+    pos
 }
 
 fn final_position_with_aim(commands: &[Command]) -> Position {
@@ -277,21 +277,21 @@ fn final_position_with_aim(commands: &[Command]) -> Position {
         };
     }
 
-    return pos;
+    pos
 }
 
 fn part1() -> u32 {
     let commands: Vec<Command> = data::get("data/day2.txt");
 
     let pos = final_position(&commands);
-    return pos.depth * pos.horizontal;
+    pos.depth * pos.horizontal
 }
 
 fn part2() -> u32 {
     let commands: Vec<Command> = data::get("data/day2.txt");
 
     let pos = final_position_with_aim(&commands);
-    return pos.depth * pos.horizontal;
+    pos.depth * pos.horizontal
 }
 
 fn main() {
