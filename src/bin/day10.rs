@@ -211,7 +211,7 @@ fn autocomplete(s: &str) -> Option<String> {
     let r = parse(s);
 
     // Get stack, or return none if the input is not incomplete.
-    let mut stack = match r {
+    let stack = match r {
         Err(ChunkParseError::Incomplete(s)) => s,
         _ => return None
     };
