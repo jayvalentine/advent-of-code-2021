@@ -194,11 +194,7 @@ impl SegmentDisplay {
 
         // Only one permutation - this one.
         // Otherwise recurse.
-        if first_pos.is_none() {
-            return vec![self.clone()];
-        }
-        else {
-            let pos = first_pos.unwrap();
+        if let Some(pos) = first_pos {
             let mut perms = Vec::new();
 
             // Create a new SegmentDisplay for each possibility of this segment.
@@ -218,6 +214,9 @@ impl SegmentDisplay {
             }
 
             perms
+        }
+        else {
+            vec![self.clone()]
         }
     }
 

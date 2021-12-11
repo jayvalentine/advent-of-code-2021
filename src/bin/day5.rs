@@ -2,6 +2,7 @@
 // Day 5
 
 use std::str::FromStr;
+use std::cmp::Ordering;
 
 use aoc::data;
 use aoc::drawing::{Point, Grid};
@@ -191,30 +192,25 @@ fn overlapping_lines_without_diagonal(lines: &[Line]) -> u32 {
 }
 
 fn overlapping_lines(lines: &[Line]) -> u32 {
+    let xsize = max_x(lines) as usize;
+    let ysize = max_y(lines) as usize;
+
     // Create the grid.
-    let mut grid = Grid::new();
+    let mut grid = Grid::new(xsize, ysize);
 
     // For each line, plot on the grid.
     for line in lines {
         // Calculate dx and dy.
-        let dx = if line.p1.x > line.p2.x {
-            -1
-        }
-        else if line.p2.x > line.p1.x {
-            1
-        }
-        else {
-            0
+        let dx = match line.p1.x.cmp(&line.p2.x) {
+            Ordering::Greater => -1,
+            Ordering::Less => 1,
+            Ordering::Equal => 0
         };
         
-        let dy = if line.p1.y > line.p2.y {
-            -1
-        }
-        else if line.p2.y > line.p1.y {
-            1
-        }
-        else {
-            0
+        let dy = match line.p1.y.cmp(&line.p2.y) {
+            Ordering::Greater => -1,
+            Ordering::Less => 1,
+            Ordering::Equal => 0
         };
 
         let mut p = line.p1;

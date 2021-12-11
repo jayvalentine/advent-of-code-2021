@@ -207,10 +207,10 @@ fn total_flashes(grid: &mut Grid) -> u64 {
 
 fn first_synchronized_flash(grid: &mut Grid) -> u64 {
     let mut this_step = 0;
-    let len = grid.len();
+    let size = grid.size();
     loop {
         let flashes = step(grid);
-        if flashes == len as u64 {
+        if flashes == size as u64 {
             return this_step + 1;
         }
         this_step += 1;

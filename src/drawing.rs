@@ -78,28 +78,28 @@ impl Point {
 }
 
 pub struct Grid {
+    xsize: usize,
+    ysize: usize,
     grid: HashMap<Point, u32>
 }
 
 impl Grid {
-    pub fn new() -> Grid {
-        Grid { grid: HashMap::new() }
+    pub fn new(xsize: usize, ysize: usize) -> Grid {
+        Grid { xsize, ysize, grid: HashMap::new() }
     }
 
     pub fn from_array(grid: Vec<Vec<u32>>) -> Grid {
+        let xsize = grid[0].len();
+        let ysize = grid.len();
+
         let mut g = HashMap::new();
-        let mut y = 0;
-        let mut x = 0;
-        for row in grid {
-            x = 0;
-            for v in row {
-                g.insert(Point::new(x, y), v);
-                x += 1;
+        for (y, row) in grid.into_iter().enumerate() {
+            for (x, v) in row.into_iter().enumerate() {
+                g.insert(Point::new(x as i64, y as i64), v);
             }
-            y += 1;
         }
 
-        Grid { grid: g }
+        Grid { xsize, ysize, grid: g }
     }
 
     pub fn points(&self) -> Vec<Point> {
@@ -108,8 +108,8 @@ impl Grid {
         p
     }
 
-    pub fn len(&self) -> usize {
-        self.points().len()
+    pub fn size(&self) -> usize {
+        self.xsize * self.ysize
     }
 
     pub fn neighbours(&self, p: &Point) -> Vec<Point> {
@@ -159,7 +159,7 @@ impl Grid {
     }
 
     pub fn do_each(&mut self, f: &dyn Fn(u32) -> u32) {
-        for (_k, v) in self.grid.iter_mut() {
+        for v in self.grid.values_mut() {
             *v = f(*v);
         }
     }
@@ -168,7 +168,7 @@ impl Grid {
     pub fn count(&self, f: &dyn Fn(u32) -> bool) -> u32 {
         let mut count = 0;
 
-        for (_, v) in &self.grid {
+        for v in self.grid.values() {
             if f(*v) { count += 1; }
         }
         

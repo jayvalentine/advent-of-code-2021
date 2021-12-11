@@ -276,18 +276,18 @@ impl BingoBoard {
     fn parse(input: &mut Iter<&str>) -> BingoBoard {
         let mut grid = [[0; 5]; 5];
 
-        for y in 0..5 {
+        for row in grid.iter_mut() {
             let mut row_str = input.next().expect("Missing row!");
             while row_str.trim().is_empty() {
                 row_str = input.next().expect("Missing row!");
             }
             
             let mut row_iter = row_str.split_whitespace();
-            for x in 0..5 {
+            for v in row.iter_mut() {
                 let n: u32 = row_iter.next().expect("Incomplete row!")
                                      .parse().expect("Incomplete row!");
 
-                grid[y][x] = n;
+                *v = n;
             }
         }
 
@@ -341,10 +341,10 @@ impl BingoBoard {
 
     fn score(&self) -> u32 {
         let mut score = 0;
-        for y in 0..5 {
-            for x in 0..5 {
+        for (y, row) in self.grid.iter().enumerate() {
+            for (x, v) in row.iter().enumerate() {
                 if !self.marks[y][x] {
-                    score += self.grid[y][x];
+                    score += v;
                 }
             }
         }
