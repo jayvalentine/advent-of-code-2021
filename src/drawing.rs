@@ -1,6 +1,5 @@
 // Implementations relating to drawing.
 
-use std::cmp::Ordering;
 use std::hash::Hash;
 use std::str::FromStr;
 use std::collections::HashMap;
@@ -115,6 +114,10 @@ impl Grid {
         return p;
     }
 
+    pub fn len(&self) -> usize {
+        return self.points().len();
+    }
+
     pub fn neighbours(&self, p: &Point) -> Vec<Point> {
         let x = p.x;
         let y = p.y;
@@ -129,6 +132,20 @@ impl Grid {
                          .map(|p| *p).collect();
     }
 
+    pub fn neighbours_diagonal(&self, p: &Point) -> Vec<Point> {
+        let x = p.x;
+        let y = p.y;
+        let mut neighbours = self.neighbours(p);
+
+        neighbours.push(Point::new(x-1, y-1));
+        neighbours.push(Point::new(x-1, y+1));
+        neighbours.push(Point::new(x+1, y-1));
+        neighbours.push(Point::new(x+1, y+1));
+
+        return neighbours.iter().filter(|p| self.grid.contains_key(&p))
+                         .map(|p| *p).collect();
+    }
+
     pub fn set(&mut self, p: Point, val: u32) {
         self.grid.insert(p, val);
     }
@@ -137,6 +154,12 @@ impl Grid {
         return match self.grid.get(p) {
             Some(v) => Some(*v),
             None => None
+        }
+    }
+
+    pub fn do_each(&mut self, f: &dyn Fn(u32) -> u32) {
+        for (_k, v) in self.grid.iter_mut() {
+            *v = f(*v);
         }
     }
 
