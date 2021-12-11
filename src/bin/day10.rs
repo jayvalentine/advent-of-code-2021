@@ -37,6 +37,54 @@ mod test_examples {
         let result = parse(input);
         assert_eq!(ChunkParseError::Mismatch(']', '>'), result.expect_err("error did not occur!"));
     }
+
+    #[test]
+    fn part2() {
+        let input = "[({(<(())[]>[[{[]{<()<>>";
+        let completion_string = autocomplete(input);
+        assert_eq!("}}]])})]", completion_string.expect("expected completion string!"));
+
+        let input = "[(()[<>])]({[<{<<[]>>(";
+        let completion_string = autocomplete(input);
+        assert_eq!(")}>]})", completion_string.expect("expected completion string!"));
+
+        let input = "(((({<>}<{<{<>}{[]{[]{}";
+        let completion_string = autocomplete(input);
+        assert_eq!("}}>}>))))", completion_string.expect("expected completion string!"));
+
+        let input = "{<[[]]>}<{[{[{[]{()[[[]";
+        let completion_string = autocomplete(input);
+        assert_eq!("]]}}]}]}>", completion_string.expect("expected completion string!"));
+
+        let input = "<{([{{}}[<[[[<>{}]]]>[]]";
+        let completion_string = autocomplete(input);
+        assert_eq!("])}>", completion_string.expect("expected completion string!"));
+    }
+}
+
+#[cfg(test)]
+mod test_autocomplete {
+    use super::*;
+
+    #[test]
+    fn single_char() {
+        assert_eq!(")", autocomplete("(").expect("expected completion string!"));
+    }
+
+    #[test]
+    fn two_open() {
+        assert_eq!(">]", autocomplete("[<()").expect("expected completion string!"));
+    }
+
+    #[test]
+    fn nested() {
+        assert_eq!("]", autocomplete("[[]").expect("expected completion string!"));
+    }
+
+    #[test]
+    fn complete() {
+        assert_eq!(None, autocomplete("()"));
+    }
 }
 
 #[cfg(test)]
@@ -112,6 +160,31 @@ enum ChunkParseError {
     Imbalance
 }
 
+fn autocomplete(s: &str) -> Option<String> {
+    let r = parse(s);
+
+    // Get stack, or return none if the input is not incomplete.
+    let mut stack = match r {
+        Err(ChunkParseError::Incomplete(s)) => s,
+        _ => return None
+    };
+
+    // We've got a stack - map each entry onto the expected
+    // RHS character and reverse to form the completion string!
+    return Some(stack.iter().map(|c| expected_rhs(*c)).rev().collect());
+}
+
+// Given a LHS character, returns the expected RHS character.
+fn expected_rhs(c: char) -> char {
+    return match c {
+        '(' => ')',
+        '[' => ']',
+        '<' => '>',
+        '{' => '}',
+        _ => unreachable!()
+    };
+}
+
 fn parse(s: &str) -> Result<(), ChunkParseError> {
     let lhs = ['(', '[', '{', '<'];
     let rhs = [')', ']', '}', '>'];
@@ -128,13 +201,7 @@ fn parse(s: &str) -> Result<(), ChunkParseError> {
         else if rhs.contains(&c) {
             let expected = stack.pop();
             let expected = match expected {
-                Some(e) => match e {
-                    '(' => ')',
-                    '[' => ']',
-                    '<' => '>',
-                    '{' => '}',
-                    _ => unreachable!()
-                },
+                Some(e) => expected_rhs(e),
                 None => return Err(ChunkParseError::Imbalance)
             };
             
