@@ -58,7 +58,7 @@ enum SegmentPosition {
 
 impl SegmentPosition {
     fn all() -> [SegmentPosition; 7] {
-        return [
+        [
             SegmentPosition::Top,
             SegmentPosition::TopLeft,
             SegmentPosition::TopRight,
@@ -66,7 +66,7 @@ impl SegmentPosition {
             SegmentPosition::BottomLeft,
             SegmentPosition::BottomRight,
             SegmentPosition::Bottom
-        ];
+        ]
     }
 }
 
@@ -106,21 +106,21 @@ impl Segment {
     }
 
     fn len(&self) -> usize {
-        return self.possibles.len();
+        self.possibles.len()
     }
 
     fn must_be(&self, s: &str) -> Segment {
         let iter = s.chars();
         let other = HashSet::from_iter(iter);
         let intersect = self.possibles.intersection(&other);
-        return Segment { possibles: HashSet::from_iter(intersect.map(|c| *c)) };
+        Segment { possibles: HashSet::from_iter(intersect.copied()) }
     }
 
     fn cannot_be(&self, s: &str) -> Segment {
         let iter = s.chars();
         let other = HashSet::from_iter(iter);
         let diff = self.possibles.difference(&other);
-        return Segment { possibles: HashSet::from_iter(diff.map(|c| *c)) }
+        Segment { possibles: HashSet::from_iter(diff.copied()) }
     }
 }
 
@@ -141,7 +141,7 @@ impl SegmentDisplay {
             segments.insert(pos, Segment::new(signals));
         }
         
-        return SegmentDisplay { segments }
+        SegmentDisplay { segments }
     }
 
     // Excludes the possible signals given a number and its pattern.
@@ -178,7 +178,7 @@ impl SegmentDisplay {
             }
         }
 
-        return SegmentDisplay { segments: new_segments };
+        SegmentDisplay { segments: new_segments }
     }
 
     fn permutations(&self) -> Vec<SegmentDisplay> {
@@ -186,7 +186,7 @@ impl SegmentDisplay {
         let mut first_pos = None;
         let positions = SegmentPosition::all();
         for pos in positions.iter() {
-            if self.segments[&pos].len() > 1 {
+            if self.segments[pos].len() > 1 {
                 first_pos = Some(pos);
                 break;
             }
@@ -203,21 +203,21 @@ impl SegmentDisplay {
 
             // Create a new SegmentDisplay for each possibility of this segment.
             // Concatenate the permutations of that segment display onto this one.
-            for c in &self.segments[&pos].possibles {
+            for c in &self.segments[pos].possibles {
                 let mut new = self.clone();
-                new.segments.insert(*pos, self.segments[&pos].must_be(&format!("{}", c)));
+                new.segments.insert(*pos, self.segments[pos].must_be(&format!("{}", c)));
 
                 // All other positions cannot be this one.
                 for other_pos in positions.iter() {
                     if other_pos != pos {
-                        new.segments.insert(*other_pos, self.segments[&other_pos].cannot_be(&format!("{}", c)));
+                        new.segments.insert(*other_pos, self.segments[other_pos].cannot_be(&format!("{}", c)));
                     }
                 }
 
                 perms.append(&mut new.permutations());
             }
 
-            return perms;
+            perms
         }
     }
 
@@ -313,7 +313,7 @@ impl SegmentDisplay {
         h.insert(SegmentPosition::Bottom);
         v.push(h);
 
-        return v;
+        v
     }
 
     fn digit(&self, pattern: &str) -> Option<u32> {
@@ -339,11 +339,11 @@ impl SegmentDisplay {
                 return Some(val as u32);
             }
         }
-        return None;
+        None
     }
 
     fn valid(&self, pattern: &str) -> bool {
-        return self.digit(pattern).is_some();
+        self.digit(pattern).is_some()
     }
 }
 
@@ -356,7 +356,7 @@ fn count_segments(segments: &[String], num_segments: &[u32]) -> u32 {
         }
     }
 
-    return count;
+    count
 }
 
 fn get_segment_config(patterns: &[String]) -> SegmentDisplay {
@@ -391,11 +391,11 @@ fn get_output(patterns: &[String], output_patterns: &[String]) -> u32 {
     // Get each output digit.
     let mut val = 0;
     for pattern in output_patterns {
-        val = val * 10;
-        val = val + seg.digit(pattern).expect("Didn't decode!");
+        val *= 10;
+        val += seg.digit(pattern).expect("Didn't decode!");
     }
 
-    return val;
+    val
 }
 
 fn get_segments(i: &mut Iter<&str>) -> Vec<(Vec<String>, Vec<String>)> {
