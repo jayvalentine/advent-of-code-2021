@@ -88,7 +88,7 @@ mod test_step {
 
         let mut grid = get_grid(&mut input.iter());
         assert_eq!(1, step(&mut grid));
-        assert_eq!(0, grid.get(&Point::new(1, 1)).expect("expected value"));
+        assert_eq!(0, grid.get(&Point::new(1, 1)));
         assert_eq!(8, grid.count(&|v| v == 2));
     }
 
@@ -102,13 +102,13 @@ mod test_step {
 
         let mut grid = get_grid(&mut input.iter());
         assert_eq!(1, step(&mut grid));
-        assert_eq!(0, grid.get(&Point::new(1, 0)).expect("expected value"));
+        assert_eq!(0, grid.get(&Point::new(1, 0)));
         assert_eq!(5, grid.count(&|v| v == 2));
         assert_eq!(3, grid.count(&|v| v == 1));
 
-        assert_eq!(1, grid.get(&Point::new(0, 2)).expect("expected value"));
-        assert_eq!(1, grid.get(&Point::new(1, 2)).expect("expected value"));
-        assert_eq!(1, grid.get(&Point::new(2, 2)).expect("expected value"));
+        assert_eq!(1, grid.get(&Point::new(0, 2)));
+        assert_eq!(1, grid.get(&Point::new(1, 2)));
+        assert_eq!(1, grid.get(&Point::new(2, 2)));
     }
 
     #[test]
@@ -122,12 +122,12 @@ mod test_step {
         let mut grid = get_grid(&mut input.iter());
         assert_eq!(2, step(&mut grid));
 
-        assert_eq!(0, grid.get(&Point::new(0, 1)).expect("expected value"));
-        assert_eq!(0, grid.get(&Point::new(0, 0)).expect("expected value"));
+        assert_eq!(0, grid.get(&Point::new(0, 1)));
+        assert_eq!(0, grid.get(&Point::new(0, 0)));
 
-        assert_eq!(5, grid.get(&Point::new(1, 0)).expect("expected value"));
-        assert_eq!(3, grid.get(&Point::new(1, 1)).expect("expected value"));
-        assert_eq!(2, grid.get(&Point::new(0, 2)).expect("expected value"));
+        assert_eq!(5, grid.get(&Point::new(1, 0)));
+        assert_eq!(3, grid.get(&Point::new(1, 1)));
+        assert_eq!(2, grid.get(&Point::new(0, 2)));
 
         assert_eq!(3, grid.count(&|v| v == 1));
     }
@@ -154,7 +154,7 @@ fn step(grid: &mut Grid) -> u64 {
     // Now calculate flashes.
     let mut flashes: HashSet<Point> = HashSet::new();
     for p in grid.points() {
-        let v = grid.get(&p).expect("expected value");
+        let v = grid.get(&p);
         if v > 9 {
             flashes.insert(p);
         }
@@ -169,15 +169,15 @@ fn step(grid: &mut Grid) -> u64 {
         for flash in &iter_flashes {
             let neighbours = grid.neighbours_diagonal(&flash);
             for n in neighbours {
-                let new_v = grid.get(&n).expect("expected value") + 1;
-                grid.set(n, new_v);
+                let new_v = grid.get(&n) + 1;
+                grid.set(&n, new_v);
             }
         }
 
         for p in grid.points() {
             if flashes.contains(&p) { continue; }
 
-            let v = grid.get(&p).expect("expected value");
+            let v = grid.get(&p);
             if v > 9 {
                 new_flashes.insert(p);
                 flashes.insert(p);
@@ -191,7 +191,7 @@ fn step(grid: &mut Grid) -> u64 {
     }
 
     for f in &flashes {
-        grid.set(*f, 0);
+        grid.set(f, 0);
     }
 
     return count_flashes as u64;

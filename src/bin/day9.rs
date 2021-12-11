@@ -35,10 +35,10 @@ mod test_examples {
         let local_minima = local_minima(&grid);
 
         assert_eq!(4, local_minima.len());
-        assert_eq!(1, grid.get(&local_minima[0]).expect("expected value"));
-        assert_eq!(0, grid.get(&local_minima[1]).expect("expected value"));
-        assert_eq!(5, grid.get(&local_minima[2]).expect("expected value"));
-        assert_eq!(5, grid.get(&local_minima[3]).expect("expected value"));
+        assert_eq!(1, grid.get(&local_minima[0]));
+        assert_eq!(0, grid.get(&local_minima[1]));
+        assert_eq!(5, grid.get(&local_minima[2]));
+        assert_eq!(5, grid.get(&local_minima[3]));
     }
 
     #[test]
@@ -153,9 +153,9 @@ fn local_minima(g: &Grid) -> Vec<Point> {
     let mut minima = Vec::new();
 
     for p in g.points() {
-        let val = g.get(&p).expect("invalid point");
+        let val = g.get(&p);
         let neighbours = g.neighbours(&p);
-        let neighbours: Vec<u32> = neighbours.iter().map(|n| g.get(n).expect("invalid point")).collect();
+        let neighbours: Vec<u32> = neighbours.iter().map(|n| g.get(n)).collect();
 
         if is_minimum(&val, &neighbours) {
             minima.push(p);
@@ -185,7 +185,7 @@ fn get_basin(g: &Grid, starting_point: Point) -> Vec<Point> {
         let mut next_to_visit = Vec::new();
 
         for p in &to_visit {
-            let val = g.get(&p).expect("invalid point");
+            let val = g.get(&p);
             if val != 9 {
                 if !visited.contains(p) {
                     visited.push(*p);
@@ -217,7 +217,7 @@ fn part1() -> u32 {
     
     let mut risk_level = 0;
     for m in minima {
-        risk_level += grid.get(&m).expect("invalid point") + 1;
+        risk_level += grid.get(&m) + 1;
     }
 
     return risk_level;

@@ -78,26 +78,26 @@ impl Point {
 }
 
 pub struct Grid {
+    xsize: usize,
+    ysize: usize,
     grid: HashMap<Point, u32>
 }
 
 impl Grid {
-    pub fn new(x_dim: i64, y_dim: i64) -> Grid {
-        let mut grid = HashMap::new();
-        for y in 0..(y_dim+1) {
-            for x in 0..(x_dim+1) {
-                grid.insert(Point::new(x, y), 0);
-            }
-        }
-
-        return Grid { grid };
+    pub fn new(x_dim: usize, y_dim: usize) -> Grid {
+        return Grid {
+            xsize: x_dim,
+            ysize: y_dim,
+            grid: HashMap::new()
+        };
     }
 
     pub fn from_array(grid: Vec<Vec<u32>>) -> Grid {
         let mut g = HashMap::new();
         let mut y = 0;
+        let mut x = 0;
         for row in grid {
-            let mut x = 0;
+            x = 0;
             for v in row {
                 g.insert(Point::new(x, y), v);
                 x += 1;
@@ -105,7 +105,11 @@ impl Grid {
             y += 1;
         }
 
-        return Grid { grid: g }
+        return Grid {
+            xsize: x as usize,
+            ysize: y as usize,
+            grid: g
+        }
     }
 
     pub fn points(&self) -> Vec<Point> {
@@ -146,14 +150,23 @@ impl Grid {
                          .map(|p| *p).collect();
     }
 
-    pub fn set(&mut self, p: Point, val: u32) {
-        self.grid.insert(p, val);
+    pub fn set(&mut self, p: &Point, val: u32) {
+        *self.grid.get_mut(p).unwrap() = val;
     }
 
-    pub fn get(&self, p: &Point) -> Option<u32> {
+    pub fn increment(&mut self, p: &Point) {
+        if !self.grid.contains_key(p) {
+            self.grid.insert(*p, 0);
+        }
+
+        let p = self.grid.get_mut(p).unwrap();
+        *p += 1;
+    }
+
+    pub fn get(&self, p: &Point) -> u32 {
         return match self.grid.get(p) {
-            Some(v) => Some(*v),
-            None => None
+            Some(v) => *v,
+            None => 0
         }
     }
 

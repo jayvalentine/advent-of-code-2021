@@ -196,7 +196,7 @@ fn overlapping_lines(lines: &[Line]) -> u32 {
     let max_y = max_y(lines);
 
     // Create the grid.
-    let mut grid = Grid::new(max_x, max_y);
+    let mut grid = Grid::new(max_x as usize, max_y as usize);
 
     // For each line, plot on the grid.
     for line in lines {
@@ -221,23 +221,20 @@ fn overlapping_lines(lines: &[Line]) -> u32 {
             0
         };
 
-        let mut x = line.p1.x;
-        let mut y = line.p1.y;
-
-        let x_end = line.p2.x;
-        let y_end = line.p2.y;
+        let mut p = line.p1;
+        let p_end = line.p2;
 
         loop {
-            grid.set(Point::new(x, y), grid.get(&Point::new(x, y)).expect("expected value") + 1);
-            x += dx;
-            y += dy;
+            grid.increment(&p);
+            p.x += dx;
+            p.y += dy;
 
-            if (x == x_end) && (y == y_end) {
+            if p == p_end {
                 break;
             }
         }
 
-        grid.set(Point::new(x_end, y_end), grid.get(&Point::new(x_end, y_end)).expect("expected value") + 1);
+        grid.increment(&p);
     }
 
     // Return number of squares with more than one line.
