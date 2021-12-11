@@ -169,8 +169,7 @@ fn step(grid: &mut Grid) -> u64 {
         for flash in &iter_flashes {
             let neighbours = grid.neighbours_diagonal(flash);
             for n in neighbours {
-                let new_v = grid.get(&n) + 1;
-                grid.set(&n, new_v);
+                grid.increment(&n);
             }
         }
 
