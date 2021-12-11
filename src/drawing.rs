@@ -41,8 +41,8 @@ pub enum PointParseError {
 
 #[derive(Clone, Copy)]
 pub struct Point {
-    pub x: u32,
-    pub y: u32
+    pub x: i64,
+    pub y: i64
 }
 
 impl FromStr for Point {
@@ -55,12 +55,12 @@ impl FromStr for Point {
         let x = s_iter.next().ok_or(PointParseError::MissingX)?;
         let y = s_iter.next().ok_or(PointParseError::MissingY)?;
 
-        let x: u32 = match x.parse() {
+        let x: i64 = match x.parse() {
             Ok(n) => n,
             Result::Err(_) => return Result::Err(PointParseError::NotNumberX)
         };
 
-        let y: u32 = match y.parse() {
+        let y: i64 = match y.parse() {
             Ok(n) => n,
             Result::Err(_) => return Result::Err(PointParseError::NotNumberY)
         };

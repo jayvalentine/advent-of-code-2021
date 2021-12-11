@@ -151,7 +151,7 @@ impl FromStr for Line {
     }
 }
 
-fn max_x(lines: &[Line]) -> u32 {
+fn max_x(lines: &[Line]) -> i64 {
     let mut x = 0;
     for l in lines {
         if l.p1.x > x { x = l.p1.x }
@@ -161,7 +161,7 @@ fn max_x(lines: &[Line]) -> u32 {
     return x;
 }
 
-fn max_y(lines: &[Line]) -> u32 {
+fn max_y(lines: &[Line]) -> i64 {
     let mut y = 0;
     for l in lines {
         if l.p1.y > y { y = l.p1.y }
