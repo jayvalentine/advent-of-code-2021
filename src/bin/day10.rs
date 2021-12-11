@@ -1,6 +1,16 @@
 // Advent of Code 2021
 // Day 10
 
+use aoc::data;
+
+#[cfg(test)]
+mod test_puzzles {
+    #[test]
+    fn part1() {
+        assert_eq!(240123, super::part1());
+    }
+}
+
 #[cfg(test)]
 mod test_examples {
     use super::*;
@@ -78,7 +88,7 @@ mod test_parse {
     #[test]
     fn incomplete() {
         let input = "<()";
-        assert_eq!(ChunkParseError::Incomplete, parse(input).expect_err("error did not occur!"));
+        assert_eq!(ChunkParseError::Incomplete(vec!['<']), parse(input).expect_err("error did not occur!"));
     }
 
     #[test]
@@ -97,7 +107,7 @@ mod test_parse {
 #[derive(PartialEq, Eq, Debug)]
 enum ChunkParseError {
     Mismatch(char, char),
-    Incomplete,
+    Incomplete(Vec<char>),
     Invalid(char),
     Imbalance
 }
@@ -142,15 +152,37 @@ fn parse(s: &str) -> Result<(), ChunkParseError> {
     // If we reach end of input and the stack is not empty,
     // we've got an incomplete chunk.
     if stack.len() > 0 {
-        return Err(ChunkParseError::Incomplete);
+        return Err(ChunkParseError::Incomplete(stack));
     }
 
     // We've not seen any errors, so it's a valid chunk!
     return Ok(());
 }
 
+fn syntax_score(e: ChunkParseError) -> u32 {
+    return match e {
+        ChunkParseError::Mismatch(_, c) => match c {
+            ')' => 3,
+            ']' => 57,
+            '}' => 1197,
+            '>' => 25137,
+            _ => 0
+        },
+        _ => 0
+    }
+}
+
 fn part1() -> u32 {
-    return 0;
+    let input: Vec<String> = data::get("data/day10.txt");
+    let mut score = 0;
+    for i in input {
+        let r = parse(&i);
+        if r.is_err() {
+            score += syntax_score(r.unwrap_err());
+        }
+    }
+
+    return score;
 }
 
 fn part2() -> u32 {
