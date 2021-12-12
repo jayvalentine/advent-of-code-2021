@@ -1,8 +1,8 @@
 // Advent of Code
 // Day 12
 
-use std::{str::FromStr, collections::HashMap};
-
+use std::str::FromStr;
+use std::slice::Iter;
 
 use aoc::data;
 
@@ -258,27 +258,27 @@ impl CaveGraph {
         return self.caves.iter().position(|c| c.cavetype == CaveType::Start ).unwrap();
     }
 
-    fn cave(&self, i: usize) -> Cave {
-        self.caves[i].clone()
+    fn cave(&self, i: usize) -> &Cave {
+        &self.caves[i]
+    }
+
+    fn num_caves(&self) -> usize {
+        self.caves.len()
     }
 
     fn connected(&self, cave: usize) -> Vec<usize> {
-        let mut conn = Vec::new();
-        for e in &self.edges {
-            if cave == e.0 { conn.push(e.1) }
-        }
-        conn
+        self.edges.iter().filter_map(|e| if e.0 == cave { Some(e.1) } else { None }).collect()
     }
 }
 
-fn find_paths(caves: &CaveGraph, c: usize, mut visited: Vec<Cave>) -> Option<Vec<Vec<Cave>>> {
+fn find_paths(caves: &CaveGraph, c: usize, mut visited: Vec<usize>) -> Option<Vec<Vec<usize>>> {
     let cave = caves.cave(c);
 
-    if (cave.cavetype == CaveType::Small || cave.cavetype == CaveType::Start) && visited.contains(&cave) {
+    if (cave.cavetype == CaveType::Small || cave.cavetype == CaveType::Start) && visited.contains(&c) {
         return None;
     }
 
-    visited.push(cave.clone());
+    visited.push(c);
     if cave.cavetype == CaveType::End {
         return Some(vec![visited]);
     }
@@ -296,38 +296,34 @@ fn find_paths(caves: &CaveGraph, c: usize, mut visited: Vec<Cave>) -> Option<Vec
     Some(paths)
 }
 
-fn find_paths_visit_twice(caves: &CaveGraph, c: usize, mut visited: Vec<Cave>) -> Option<Vec<Vec<Cave>>> {
+fn find_paths_visit_twice(caves: &CaveGraph, c: usize, mut visited: Vec<usize>) -> Option<Vec<Vec<usize>>> {
     let cave = caves.cave(c);
+    let num_caves = caves.num_caves();
 
-    if cave.cavetype == CaveType::Start && visited.contains(&cave) {
+    if cave.cavetype == CaveType::Start && visited.contains(&c) {
         return None;
     }
 
     if cave.cavetype == CaveType::Small {
-        let mut small_cave_counts = HashMap::new();
-        for v in &visited {
-            if v.cavetype != CaveType::Small { continue; }
-            if !small_cave_counts.contains_key(&v.name) {
-                small_cave_counts.insert(v.name.clone(), 0);
-            }
-            *small_cave_counts.get_mut(&v.name).unwrap() += 1;
+        let mut small_cave_counts = vec![0; num_caves];
+        for &v in &visited {
+            let v_cave = caves.cave(v);
+            if v_cave.cavetype != CaveType::Small { continue; }
+            small_cave_counts[v] += 1;
         }
         
-        let visited_count = match small_cave_counts.get(&cave.name) {
-            Some(c) => *c,
-            None => 0
-        };
+        let visited_count = small_cave_counts[c];
 
         if visited_count == 2 {
             return None;
         }
         
-        if visited_count == 1 && small_cave_counts.values().any(|c| *c > 1) {
+        if visited_count == 1 && small_cave_counts.iter().any(|c| *c > 1) {
             return None;
         }
     }
     
-    visited.push(cave.clone());
+    visited.push(c);
     if cave.cavetype == CaveType::End {
         return Some(vec![visited]);
     }
@@ -362,5 +358,5 @@ fn part2() -> u32 {
 }
 
 fn main() {
-    aoc::solution!(12, "# paths", "# paths (visit one small twice)");
+    aoc::solution!(12, "# paths", "# paths (new rules)");
 }
