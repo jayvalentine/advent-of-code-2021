@@ -83,13 +83,6 @@ mod test_examples {
 
         let paths = find_paths_visit_twice(&caves, caves.start(), Vec::new()).expect("expected paths!");
 
-        for p in &paths {
-            for c in p {
-                print!("{} ", c.name);
-            }
-            println!("");
-        }
-
         assert_eq!(36, paths.len());
     }
 
