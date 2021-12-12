@@ -81,7 +81,7 @@ mod test_examples {
         let input: Vec<CavePair> = input.iter().map(|i| CavePair::from_str(i).expect("Parse error!")).collect();
         let caves = CaveGraph::new(&input);
 
-        let paths = find_paths_visit_twice(&caves, caves.start(), Vec::new()).expect("expected paths!");
+        let paths = find_paths_visit_twice(&caves, caves.start(), Vec::new(), vec![0; caves.num_caves()]).expect("expected paths!");
 
         assert_eq!(36, paths.len());
     }
@@ -104,7 +104,7 @@ mod test_examples {
         let input: Vec<CavePair> = input.iter().map(|i| CavePair::from_str(i).expect("Parse error!")).collect();
         let caves = CaveGraph::new(&input);
 
-        let paths = find_paths_visit_twice(&caves, caves.start(), Vec::new());
+        let paths = find_paths_visit_twice(&caves, caves.start(), Vec::new(), vec![0; caves.num_caves()]);
 
         assert_eq!(103, paths.expect("expected paths").len());
     }
@@ -266,8 +266,8 @@ impl CaveGraph {
         self.caves.len()
     }
 
-    fn connected(&self, cave: usize) -> Vec<usize> {
-        self.edges.iter().filter_map(|e| if e.0 == cave { Some(e.1) } else { None }).collect()
+    fn edges(&self) -> &Vec<(usize, usize)> {
+        &self.edges
     }
 }
 
@@ -283,44 +283,38 @@ fn find_paths(caves: &CaveGraph, c: usize, mut visited: Vec<usize>) -> Option<Ve
         return Some(vec![visited]);
     }
 
-    let connected = caves.connected(c);
     let mut paths = Vec::new();
-    for conn in connected {
-        let mut new_paths = Vec::new();
+    for edge in caves.edges() {
+        if edge.0 != c { continue; }
+        let conn = edge.1;
+
         if let Some(mut found_paths) = find_paths(caves, conn, visited.clone()) {
-            new_paths.append(&mut found_paths);
+            paths.append(&mut found_paths);
         }
-        paths.append(&mut new_paths);
     }
     
     Some(paths)
 }
 
-fn find_paths_visit_twice(caves: &CaveGraph, c: usize, mut visited: Vec<usize>) -> Option<Vec<Vec<usize>>> {
+fn find_paths_visit_twice(caves: &CaveGraph, c: usize, mut visited: Vec<usize>, mut counts: Vec<u32>) -> Option<Vec<Vec<usize>>> {
     let cave = caves.cave(c);
-    let num_caves = caves.num_caves();
 
     if cave.cavetype == CaveType::Start && visited.contains(&c) {
         return None;
     }
 
     if cave.cavetype == CaveType::Small {
-        let mut small_cave_counts = vec![0; num_caves];
-        for &v in &visited {
-            let v_cave = caves.cave(v);
-            if v_cave.cavetype != CaveType::Small { continue; }
-            small_cave_counts[v] += 1;
-        }
+        let visited_count = counts[c];
         
-        let visited_count = small_cave_counts[c];
-
         if visited_count == 2 {
             return None;
         }
         
-        if visited_count == 1 && small_cave_counts.iter().any(|c| *c > 1) {
+        if visited_count == 1 && counts.iter().any(|c| *c > 1) {
             return None;
         }
+
+        counts[c] += 1;
     }
     
     visited.push(c);
@@ -328,14 +322,13 @@ fn find_paths_visit_twice(caves: &CaveGraph, c: usize, mut visited: Vec<usize>) 
         return Some(vec![visited]);
     }
 
-    let connected = caves.connected(c);
     let mut paths = Vec::new();
-    for conn in connected {
-        let mut new_paths = Vec::new();
-        if let Some(mut found_paths) = find_paths_visit_twice(caves, conn, visited.clone()) {
-            new_paths.append(&mut found_paths);
+    for edge in caves.edges() {
+        if edge.0 != c { continue; }
+        let conn = edge.1;
+        if let Some(mut found_paths) = find_paths_visit_twice(caves, conn, visited.clone(), counts.clone()) {
+            paths.append(&mut found_paths);
         }
-        paths.append(&mut new_paths);
     }
     
     Some(paths)
@@ -353,7 +346,7 @@ fn part2() -> u32 {
     let pairs = data::get("data/day12.txt");
     let caves = CaveGraph::new(&pairs);
 
-    let paths = find_paths_visit_twice(&caves, caves.start(), Vec::new()).expect("expected at least one path!");
+    let paths = find_paths_visit_twice(&caves, caves.start(), Vec::new(), vec![0; caves.num_caves()]).expect("expected at least one path!");
     paths.len() as u32
 }
 
