@@ -4,6 +4,16 @@
 use std::str::FromStr;
 use std::ops::Index;
 
+use aoc::data;
+
+#[cfg(test)]
+mod test_puzzles {
+    #[test]
+    fn part1() {
+        assert_eq!(3450, super::part1());
+    }
+}
+
 #[cfg(test)]
 mod test_examples {
     use super::*;
@@ -215,7 +225,6 @@ impl CaveGraph {
 
 fn find_paths(caves: &CaveGraph, c: usize, mut visited: Vec<Cave>) -> Option<Vec<Vec<Cave>>> {
     let cave = caves.cave(c);
-    println!("{}", cave.name);
 
     if (cave.cavetype == CaveType::Small || cave.cavetype == CaveType::Start) && visited.contains(&cave) {
         return None;
@@ -235,11 +244,16 @@ fn find_paths(caves: &CaveGraph, c: usize, mut visited: Vec<Cave>) -> Option<Vec
         }
         paths.append(&mut new_paths);
     }
-    return Some(paths);
+    
+    Some(paths)
 }
 
 fn part1() -> u32 {
-    return 0;
+    let pairs = data::get("data/day12.txt");
+    let caves = CaveGraph::new(&pairs);
+
+    let paths = find_paths(&caves, caves.start(), Vec::new()).expect("expected at least one path!");
+    paths.len() as u32
 }
 
 fn part2() -> u32 {
