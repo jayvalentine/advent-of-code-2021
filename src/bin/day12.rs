@@ -1,7 +1,8 @@
-use std::str::FromStr;
-
 // Advent of Code
-// Day 11
+// Day 12
+
+use std::str::FromStr;
+use std::ops::Index;
 
 #[cfg(test)]
 mod test_examples {
@@ -22,9 +23,9 @@ mod test_examples {
         let input: Vec<CavePair> = input.iter().map(|i| CavePair::from_str(i).expect("Parse error!")).collect();
         let caves = CaveGraph::new(&input);
 
-        let paths = find_paths(&caves);
+        let paths = find_paths(&caves, caves.start(), Vec::new());
 
-        assert_eq!(10, paths.len());
+        assert_eq!(10, paths.expect("expected paths").len());
     }
 
     #[test]
@@ -45,9 +46,9 @@ mod test_examples {
         let input: Vec<CavePair> = input.iter().map(|i| CavePair::from_str(i).expect("Parse error!")).collect();
         let caves = CaveGraph::new(&input);
 
-        let paths = find_paths(&caves);
+        let paths = find_paths(&caves, caves.start(), Vec::new());
 
-        assert_eq!(256, paths.len());
+        assert_eq!(19, paths.expect("expected paths").len());
     }
 }
 
@@ -90,7 +91,7 @@ mod test_parse_cave {
     }
 }
 
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Clone, Copy)]
 enum CaveType {
     Start,
     End,
@@ -98,7 +99,7 @@ enum CaveType {
     Small
 }
 
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq, Eq, Debug, Clone)]
 struct Cave {
     name: String,
     cavetype: CaveType,
@@ -133,35 +134,108 @@ impl FromStr for Cave {
 }
 
 struct CavePair {
-
+    a: Cave,
+    b: Cave
 }
 
 #[derive(Debug)]
 enum CavePairParseError {
     StartInvalid(CaveParseError),
     EndInvalid(CaveParseError),
+    Incomplete
 }
 
 impl FromStr for CavePair {
     type Err = CavePairParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        return Err(CavePairParseError::StartInvalid(CaveParseError::Ambiguous))
+        let mut s = s.split('-');
+        let a = s.next().ok_or(CavePairParseError::Incomplete)?;
+        let b = s.next().ok_or(CavePairParseError::Incomplete)?;
+
+        let a = match Cave::from_str(a) {
+            Ok(c) => c,
+            Err(e) => return Err(CavePairParseError::StartInvalid(e))
+        };
+
+        let b = match Cave::from_str(b) {
+            Ok(c) => c,
+            Err(e) => return Err(CavePairParseError::EndInvalid(e))
+        };
+
+        Ok(CavePair { a, b })
     }
 }
 
 struct CaveGraph {
-
+    caves: Vec<Cave>,
+    edges: Vec<(usize, usize)>
 }
 
 impl CaveGraph {
     fn new(pairs: &[CavePair]) -> CaveGraph {
-        CaveGraph {}
+        // First get the set of caves.
+        let mut caves = Vec::new();
+        for pair in pairs {
+            if !caves.contains(&pair.a) { caves.push(pair.a.clone() )}
+            if !caves.contains(&pair.b) { caves.push(pair.b.clone() )}
+        }
+
+        // Now construct set of edges.
+        let mut edges = Vec::new();
+        for pair in pairs {
+            // Get index in caves of each end.
+            let a_index = caves.iter().position(|c| c.eq(&pair.a)).unwrap();
+            let b_index = caves.iter().position(|c| c.eq(&pair.b)).unwrap();
+
+            // Add two edges.
+            edges.push((a_index, b_index));
+            edges.push((b_index, a_index));
+        }
+
+        CaveGraph { caves, edges }
+    }
+
+    fn start(&self) -> usize {
+        return self.caves.iter().position(|c| c.cavetype == CaveType::Start ).unwrap();
+    }
+
+    fn cave(&self, i: usize) -> Cave {
+        return self.caves[i].clone();
+    }
+
+    fn connected(&self, cave: usize) -> Vec<usize> {
+        let mut conn = Vec::new();
+        for e in &self.edges {
+            if cave == e.0 { conn.push(e.1) }
+        }
+        return conn;
     }
 }
 
-fn find_paths(caves: &CaveGraph) -> Vec<Vec<&Cave>> {
-    return Vec::new();
+fn find_paths(caves: &CaveGraph, c: usize, mut visited: Vec<Cave>) -> Option<Vec<Vec<Cave>>> {
+    let cave = caves.cave(c);
+    println!("{}", cave.name);
+
+    if (cave.cavetype == CaveType::Small || cave.cavetype == CaveType::Start) && visited.contains(&cave) {
+        return None;
+    }
+
+    visited.push(cave.clone());
+    if cave.cavetype == CaveType::End {
+        return Some(vec![visited]);
+    }
+
+    let connected = caves.connected(c);
+    let mut paths = Vec::new();
+    for conn in connected {
+        let mut new_paths = Vec::new();
+        if let Some(mut found_paths) = find_paths(caves, conn, visited.clone()) {
+            new_paths.append(&mut found_paths);
+        }
+        paths.append(&mut new_paths);
+    }
+    return Some(paths);
 }
 
 fn part1() -> u32 {
