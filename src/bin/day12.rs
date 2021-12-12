@@ -2,7 +2,7 @@
 // Day 12
 
 use std::str::FromStr;
-use std::ops::Index;
+
 
 use aoc::data;
 
@@ -211,7 +211,7 @@ impl CaveGraph {
     }
 
     fn cave(&self, i: usize) -> Cave {
-        return self.caves[i].clone();
+        self.caves[i].clone()
     }
 
     fn connected(&self, cave: usize) -> Vec<usize> {
@@ -219,7 +219,7 @@ impl CaveGraph {
         for e in &self.edges {
             if cave == e.0 { conn.push(e.1) }
         }
-        return conn;
+        conn
     }
 }
 
@@ -257,7 +257,7 @@ fn part1() -> u32 {
 }
 
 fn part2() -> u32 {
-    return 0;
+    0
 }
 
 fn main() {
