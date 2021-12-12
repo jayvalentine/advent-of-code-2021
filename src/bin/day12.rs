@@ -1,7 +1,7 @@
 // Advent of Code
 // Day 12
 
-use std::str::FromStr;
+use std::{str::FromStr, collections::HashMap};
 
 
 use aoc::data;
@@ -11,6 +11,11 @@ mod test_puzzles {
     #[test]
     fn part1() {
         assert_eq!(3450, super::part1());
+    }
+
+    #[test]
+    fn part2() {
+        assert_eq!(96528, super::part2());
     }
 }
 
@@ -59,6 +64,56 @@ mod test_examples {
         let paths = find_paths(&caves, caves.start(), Vec::new());
 
         assert_eq!(19, paths.expect("expected paths").len());
+    }
+
+    #[test]
+    fn part2_1() {
+        let input = vec![
+            "start-A",
+            "start-b",
+            "A-c",
+            "A-b",
+            "b-d",
+            "A-end",
+            "b-end",
+        ];
+
+        let input: Vec<CavePair> = input.iter().map(|i| CavePair::from_str(i).expect("Parse error!")).collect();
+        let caves = CaveGraph::new(&input);
+
+        let paths = find_paths_visit_twice(&caves, caves.start(), Vec::new()).expect("expected paths!");
+
+        for p in &paths {
+            for c in p {
+                print!("{} ", c.name);
+            }
+            println!("");
+        }
+
+        assert_eq!(36, paths.len());
+    }
+
+    #[test]
+    fn part2_2() {
+        let input = vec![
+            "dc-end",
+            "HN-start",
+            "start-kj",
+            "dc-start",
+            "dc-HN",
+            "LN-dc",
+            "HN-end",
+            "kj-sa",
+            "kj-HN",
+            "kj-dc",
+        ];
+
+        let input: Vec<CavePair> = input.iter().map(|i| CavePair::from_str(i).expect("Parse error!")).collect();
+        let caves = CaveGraph::new(&input);
+
+        let paths = find_paths_visit_twice(&caves, caves.start(), Vec::new());
+
+        assert_eq!(103, paths.expect("expected paths").len());
     }
 }
 
@@ -248,6 +303,55 @@ fn find_paths(caves: &CaveGraph, c: usize, mut visited: Vec<Cave>) -> Option<Vec
     Some(paths)
 }
 
+fn find_paths_visit_twice(caves: &CaveGraph, c: usize, mut visited: Vec<Cave>) -> Option<Vec<Vec<Cave>>> {
+    let cave = caves.cave(c);
+
+    if cave.cavetype == CaveType::Start && visited.contains(&cave) {
+        return None;
+    }
+
+    if cave.cavetype == CaveType::Small {
+        let mut small_cave_counts = HashMap::new();
+        for v in &visited {
+            if v.cavetype != CaveType::Small { continue; }
+            if !small_cave_counts.contains_key(&v.name) {
+                small_cave_counts.insert(v.name.clone(), 0);
+            }
+            *small_cave_counts.get_mut(&v.name).unwrap() += 1;
+        }
+        
+        let visited_count = match small_cave_counts.get(&cave.name) {
+            Some(c) => *c,
+            None => 0
+        };
+
+        if visited_count == 2 {
+            return None;
+        }
+        
+        if visited_count == 1 && small_cave_counts.values().any(|c| *c > 1) {
+            return None;
+        }
+    }
+    
+    visited.push(cave.clone());
+    if cave.cavetype == CaveType::End {
+        return Some(vec![visited]);
+    }
+
+    let connected = caves.connected(c);
+    let mut paths = Vec::new();
+    for conn in connected {
+        let mut new_paths = Vec::new();
+        if let Some(mut found_paths) = find_paths_visit_twice(caves, conn, visited.clone()) {
+            new_paths.append(&mut found_paths);
+        }
+        paths.append(&mut new_paths);
+    }
+    
+    Some(paths)
+}
+
 fn part1() -> u32 {
     let pairs = data::get("data/day12.txt");
     let caves = CaveGraph::new(&pairs);
@@ -257,9 +361,13 @@ fn part1() -> u32 {
 }
 
 fn part2() -> u32 {
-    0
+    let pairs = data::get("data/day12.txt");
+    let caves = CaveGraph::new(&pairs);
+
+    let paths = find_paths_visit_twice(&caves, caves.start(), Vec::new()).expect("expected at least one path!");
+    paths.len() as u32
 }
 
 fn main() {
-    aoc::solution!(12, "# paths", "");
+    aoc::solution!(12, "# paths", "# paths (visit one small twice)");
 }
