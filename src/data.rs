@@ -15,12 +15,9 @@ pub fn get<T: FromStr>(file: &str) -> Vec<T> {
     for line in reader.lines() {
         let line = line.unwrap_or_else(|_| panic!("Invalid line in {}", file));
 
-        let n = match T::from_str(line.trim()) {
-            Ok(v) => v,
-            Err(_) => panic!("Parse error in {}", file)
-        };
-
-        input.push(n);
+        if let Ok(v) = T::from_str(line.trim()) {
+            input.push(v);
+        }
     }
 
     input
