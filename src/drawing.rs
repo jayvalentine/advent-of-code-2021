@@ -102,6 +102,15 @@ impl Grid {
         Grid { xsize, ysize, grid: g }
     }
 
+    pub fn from_points(points: &Vec<Point>, value: u32) -> Grid {
+        // Hacky, need to sort out proper grid sizing later.
+        let mut grid = Grid { grid: HashMap::new(), xsize: 0, ysize: 0 };
+        for p in points {
+            grid.set(p, value);
+        }
+        grid
+    }
+
     pub fn points(&self) -> Vec<Point> {
         let mut p: Vec<Point> = self.grid.keys().copied().collect();
         p.sort();
@@ -139,7 +148,13 @@ impl Grid {
     }
 
     pub fn set(&mut self, p: &Point, val: u32) {
-        *self.grid.get_mut(p).unwrap() = val;
+        if !self.grid.contains_key(p) {
+            self.grid.insert(*p, val);
+        }
+        else
+        {
+            *self.grid.get_mut(p).unwrap() = val;
+        }
     }
 
     pub fn increment(&mut self, p: &Point) {
