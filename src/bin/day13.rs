@@ -1,12 +1,20 @@
 // Advent of Code 2021
 // Day 13
 
-use std::str::FromStr;
 use aoc::drawing::*;
+
+#[cfg(test)]
+mod test_puzzles {
+    #[test]
+    fn part1() {
+        assert_eq!(695, super::part1());
+    }
+}
 
 #[cfg(test)]
 mod test_examples {
     use super::*;
+    use std::str::FromStr;
 
     fn part1() {
         let input = vec![
