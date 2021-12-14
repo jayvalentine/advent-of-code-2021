@@ -21,6 +21,7 @@ mod test_puzzles {
 mod test_examples {
     use super::*;
 
+    #[test]
     fn part1() {
         let input = vec![
             "6,10",
