@@ -212,13 +212,25 @@ fn a_star(grid: &Grid, start: Point, end: Point) -> Vec<Point> {
             if tentative_g_score < current_g_score {
                 came_from.insert(n, current);
                 g_score.insert(n, tentative_g_score);
-                f_score.insert(n, tentative_g_score + n.manhattan(&end));
+
+                let score = tentative_g_score + n.manhattan(&end);
+                f_score.insert(n, score);
 
                 if !open_set.contains(&n) {
-                    open_set.push(n);
-
-                    // Inefficient, but good enough for now!
-                    open_set.sort_by_key(|p| Reverse(get_f_score(p, &f_score)));
+                    let current_lowest_score = if open_set.is_empty() {
+                        i64::MAX
+                    }
+                    else {
+                        f_score[&open_set[open_set.len()-1]]
+                    };
+                    
+                    if open_set.is_empty() || score <= current_lowest_score {
+                        open_set.push(n);
+                    }
+                    else {
+                        let i = open_set.iter().position(|p| f_score[&p] < score).unwrap();
+                        open_set.insert(i, n);
+                    }
                 }
             }
         }
