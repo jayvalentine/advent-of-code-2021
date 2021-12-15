@@ -41,7 +41,7 @@ pub enum PointParseError {
     NotNumberY
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
 pub struct Point {
     pub y: i64,
     pub x: i64
