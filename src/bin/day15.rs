@@ -1,7 +1,8 @@
 // Advent of Code 2021
 // Day 15
 
-use std::slice::Iter;
+use std::{slice::Iter, collections::HashMap};
+use std::cmp::Reverse;
 use aoc::drawing::{Grid, Point};
 
 #[cfg(test)]
@@ -28,6 +29,7 @@ mod test_examples {
         let shortest_path = a_star(&grid, Point::new(0, 0), Point::new(9, 9));
 
         let expected = vec![
+            (0, 0),
             (0, 1),
             (0, 2),
             (1, 2),
@@ -68,8 +70,82 @@ fn get_grid(i: &mut Iter<&str>) -> Grid {
     Grid::from_array(grid)
 }
 
+fn get_f_score(p: &Point, f_score: &HashMap<Point, i64>) -> i64 {
+    match f_score.get(p) {
+        Some(v) => *v,
+        None => i64::MAX
+    }
+}
+
+fn get_g_score(p: &Point, g_score: &HashMap<Point, i64>) -> i64 {
+    match g_score.get(p) {
+        Some(v) => *v,
+        None => i64::MAX
+    }
+}
+
+fn path(p: Point, came_from: &HashMap<Point, Point>) -> Vec<Point> {
+    let mut path = vec![p];
+
+    let mut current = p;
+    while came_from.contains_key(&current) {
+        current = came_from[&current];
+        path.push(current);
+    }
+
+    path.iter().rev().map(|p| *p).collect()
+}
+
+// Implementation of the A* search algorithm.
+// Implemented with help from: https://en.wikipedia.org/wiki/A*_search_algorithm#Pseudocode
 fn a_star(grid: &Grid, start: Point, end: Point) -> Vec<Point> {
-    return Vec::new();
+    // Set of nodes under consideration for search.
+    let mut open_set: Vec<Point> = vec![start];
+
+    // For a given node n, the node immediately preceeding it
+    // on the cheapest path from start to n currently known.
+    let mut came_from: HashMap<Point, Point> = HashMap::new();
+
+    // For a node n, g_score[n] is the cost of the cheapest path
+    // from start to n currently known.
+    let mut g_score: HashMap<Point, i64> = HashMap::new();
+    g_score.insert(start, 0);
+
+    // For a node n, f_score[n] = g_score[n] + h(n).
+    // Represents current best guess as to how short a path
+    // from start to end can be if it passes through n.
+    let mut f_score: HashMap<Point, i64> = HashMap::new();
+    f_score.insert(start, start.manhattan(&end));
+
+    while open_set.len() > 0 {
+        // Inefficient, but good enough for now!
+        open_set.sort_by_key(|p| Reverse(get_f_score(p, &f_score)));
+
+        // Lowest f_score is at the end of the set.
+        let current = open_set.pop().unwrap();
+
+        if current == end {
+            return path(current, &came_from);
+        }
+
+        for n in grid.neighbours(&current) {
+            // Weight of the edge is the risk level of entering the neighbour.
+            let d = grid.get(&n) as i64;
+
+            let tentative_g_score = get_g_score(&current, &g_score) + d;
+            let current_g_score = get_g_score(&n, &g_score);
+
+            if tentative_g_score < current_g_score {
+                came_from.insert(n, current);
+                g_score.insert(n, tentative_g_score);
+                f_score.insert(n, tentative_g_score + n.manhattan(&end));
+
+                if !open_set.contains(&n) { open_set.push(n) }
+            }
+        }
+    }
+
+    panic!("Path not found!");
 }
 
 fn part1() -> u64 {

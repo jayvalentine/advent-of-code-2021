@@ -75,6 +75,12 @@ impl Point {
     pub fn new(x: i64, y: i64) -> Point {
         Point { x, y }
     }
+
+    // Calculates the manhattan distance between this point and another.
+    pub fn manhattan(&self, other: &Point) -> i64 {
+        (self.x - other.x).abs() + (self.y - other.y).abs()
+    }
+
 }
 
 pub struct Grid {
