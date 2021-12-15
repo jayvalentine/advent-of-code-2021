@@ -123,6 +123,14 @@ impl Grid {
         p
     }
 
+    pub fn xsize(&self) -> usize {
+        self.xsize
+    }
+
+    pub fn ysize(&self) -> usize {
+        self.ysize
+    }
+
     pub fn size(&self) -> usize {
         self.xsize * self.ysize
     }

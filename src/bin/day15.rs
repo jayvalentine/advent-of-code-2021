@@ -149,7 +149,20 @@ fn a_star(grid: &Grid, start: Point, end: Point) -> Vec<Point> {
 }
 
 fn part1() -> u64 {
-    return 0;
+    let grid = aoc::data::get_with_iter("data/day15.txt", &mut get_grid);
+    let start = Point::new(0, 0);
+    let end = Point::new((grid.xsize() - 1) as i64, (grid.ysize() - 1) as i64);
+
+    let shortest_path = a_star(&grid, start, end);
+
+    let mut risk = 0;
+
+    // Iterate over each point in path, ignoring first (start).
+    for p in &shortest_path[1..] {
+        risk += grid.get(p);
+    }
+
+    return risk as u64;
 }
 
 fn part2() -> u64 {
