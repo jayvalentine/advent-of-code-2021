@@ -6,6 +6,14 @@ use std::cmp::Reverse;
 use aoc::drawing::{Grid, Point};
 
 #[cfg(test)]
+mod test_puzzles {
+    #[test]
+    fn part1() {
+        assert_eq!(652, super::part1());
+    }
+}
+
+#[cfg(test)]
 mod test_examples {
     use super::*;
 
