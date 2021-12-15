@@ -192,8 +192,8 @@ fn overlapping_lines_without_diagonal(lines: &[Line]) -> u32 {
 }
 
 fn overlapping_lines(lines: &[Line]) -> u32 {
-    let xsize = max_x(lines) as usize;
-    let ysize = max_y(lines) as usize;
+    let xsize = max_x(lines);
+    let ysize = max_y(lines);
 
     // Create the grid.
     let mut grid = Grid::new(xsize, ysize);

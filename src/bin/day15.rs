@@ -11,6 +11,11 @@ mod test_puzzles {
     fn part1() {
         assert_eq!(652, super::part1());
     }
+
+    #[test]
+    fn part2() {
+        assert_eq!(2938, super::part2());
+    }
 }
 
 #[cfg(test)]
@@ -61,6 +66,70 @@ mod test_examples {
         let expected: Vec<Point> = expected.iter().map(|p| Point::new(p.0, p.1)).collect();
 
         assert_eq!(expected, shortest_path);
+    }
+
+    #[test]
+    fn part2() {
+        let input = vec![
+            "1163751742",
+            "1381373672",
+            "2136511328",
+            "3694931569",
+            "7463417111",
+            "1319128137",
+            "1359912421",
+            "3125421639",
+            "1293138521",
+            "2311944581",
+        ];
+
+        let mut grid = get_grid(&mut input.iter());
+
+        let mut other = grid.clone();
+        
+        for _ in 0..4 {
+            other.do_each(&|v| if v + 1 > 9 { 1 } else { v + 1 });
+            grid_append_right(&mut grid, &other);
+        }
+
+        let mut other = grid.clone();
+
+        for _ in 0..4 {
+            other.do_each(&|v| if v + 1 > 9 { 1 } else { v + 1 });
+            grid_append_down(&mut grid, &other);
+        }
+
+        for y in 0..grid.ysize() {
+            for x in 0..grid.xsize() {
+                let v = grid.get(&Point::new(x as i64, y as i64));
+                print!("{}", v);
+            }
+            println!();
+        }
+
+        let shortest_path = a_star(&grid, Point::new(0, 0), Point::new(grid.xsize() - 1, grid.ysize() - 1));
+
+        assert_eq!(315, risk(&grid, &shortest_path));
+    }
+}
+
+fn grid_append_right(grid: &mut Grid, other: &Grid) {
+    let new_origin = Point::new(grid.xsize() as i64, 0);
+    let other = other.move_to(&new_origin);
+
+    for point in other.points() {
+        let v = other.get(&point);
+        grid.set(&point, v);
+    }
+}
+
+fn grid_append_down(grid: &mut Grid, other: &Grid) {
+    let new_origin = Point::new(0, grid.ysize());
+    let other = other.move_to(&new_origin);
+
+    for point in other.points() {
+        let v = other.get(&point);
+        grid.set(&point, v);
     }
 }
 
@@ -158,6 +227,17 @@ fn a_star(grid: &Grid, start: Point, end: Point) -> Vec<Point> {
     panic!("Path not found!");
 }
 
+fn risk(grid: &Grid, path: &[Point]) -> u64 {
+    let mut risk = 0;
+
+    // Iterate over each point in path, ignoring first (start).
+    for p in &path[1..] {
+        risk += grid.get(p);
+    }
+
+    risk as u64
+}
+
 fn part1() -> u64 {
     let grid = aoc::data::get_with_iter("data/day15.txt", &mut get_grid);
     let start = Point::new(0, 0);
@@ -165,20 +245,34 @@ fn part1() -> u64 {
 
     let shortest_path = a_star(&grid, start, end);
 
-    let mut risk = 0;
-
-    // Iterate over each point in path, ignoring first (start).
-    for p in &shortest_path[1..] {
-        risk += grid.get(p);
-    }
-
-    risk as u64
+    risk(&grid, &shortest_path)
 }
 
 fn part2() -> u64 {
-    0
+    let mut grid = aoc::data::get_with_iter("data/day15.txt", &mut get_grid);
+
+    let mut other = grid.clone();
+        
+    for _ in 0..4 {
+        other.do_each(&|v| if v + 1 > 9 { 1 } else { v + 1 });
+        grid_append_right(&mut grid, &other);
+    }
+
+    let mut other = grid.clone();
+
+    for _ in 0..4 {
+        other.do_each(&|v| if v + 1 > 9 { 1 } else { v + 1 });
+        grid_append_down(&mut grid, &other);
+    }
+
+    let start = Point::new(0, 0);
+    let end = Point::new((grid.xsize() - 1) as i64, (grid.ysize() - 1) as i64);
+
+    let shortest_path = a_star(&grid, start, end);
+
+    risk(&grid, &shortest_path)
 }
 
 fn main() {
-    aoc::solution!(15, "lowest risk", "");
+    aoc::solution!(15, "lowest risk", "lowest risk (big grid)");
 }

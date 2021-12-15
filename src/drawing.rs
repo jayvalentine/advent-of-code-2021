@@ -80,23 +80,23 @@ impl Point {
     pub fn manhattan(&self, other: &Point) -> i64 {
         (self.x - other.x).abs() + (self.y - other.y).abs()
     }
-
 }
 
+#[derive(Clone)]
 pub struct Grid {
-    xsize: usize,
-    ysize: usize,
+    xsize: i64,
+    ysize: i64,
     grid: HashMap<Point, u32>
 }
 
 impl Grid {
-    pub fn new(xsize: usize, ysize: usize) -> Grid {
+    pub fn new(xsize: i64, ysize: i64) -> Grid {
         Grid { xsize, ysize, grid: HashMap::new() }
     }
 
     pub fn from_array(grid: Vec<Vec<u32>>) -> Grid {
-        let xsize = grid[0].len();
-        let ysize = grid.len();
+        let xsize = grid[0].len() as i64;
+        let ysize = grid.len() as i64;
 
         let mut g = HashMap::new();
         for (y, row) in grid.into_iter().enumerate() {
@@ -123,15 +123,15 @@ impl Grid {
         p
     }
 
-    pub fn xsize(&self) -> usize {
+    pub fn xsize(&self) -> i64 {
         self.xsize
     }
 
-    pub fn ysize(&self) -> usize {
+    pub fn ysize(&self) -> i64 {
         self.ysize
     }
 
-    pub fn size(&self) -> usize {
+    pub fn size(&self) -> i64 {
         self.xsize * self.ysize
     }
 
@@ -161,7 +161,27 @@ impl Grid {
         return neighbours.iter().filter(|p| self.grid.contains_key(p)).copied().collect();
     }
 
+    pub fn move_to(&self, p: &Point) -> Grid {
+        let mut new_points = HashMap::new();
+
+        for point in self.points() {
+            let new_point = Point::new(point.x + p.x, point.y + p.y);
+            new_points.insert(new_point, self.get(&point));
+        }
+
+        let new_xsize = p.x + self.xsize as i64;
+        let new_ysize = p.y + self.ysize as i64;
+
+        return Grid {
+            xsize: new_xsize,
+            ysize: new_ysize,
+            grid: new_points
+        }
+    }
+
     pub fn set(&mut self, p: &Point, val: u32) {
+        if p.x >= self.xsize { self.xsize = p.x + 1 }
+        if p.y >= self.ysize { self.ysize = p.y + 1 }
         if !self.grid.contains_key(p) {
             self.grid.insert(*p, val);
         }
