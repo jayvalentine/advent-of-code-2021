@@ -47,7 +47,7 @@ mod test_examples {
         for r in rules_str {
             let mut r_iter = r.split(" -> ");
             let pair = r_iter.next().expect("pair parse error!");
-            let insert = r_iter.next().expect("insert parse error!").chars().nth(0).unwrap();
+            let insert = r_iter.next().expect("insert parse error!").chars().next().unwrap();
 
             rules.insert(String::from(pair), insert);
         }
@@ -114,14 +114,12 @@ fn to_pairs(input: &str) -> HashMap<String, u64> {
 
     for i in 0..(input.len()-1) {
         let s = String::from(&input[i..i+2]);
-        if !pairs.contains_key(&s) {
-            pairs.insert(s, 0);
-        }
+        pairs.entry(s).or_insert(0);
 
         *pairs.get_mut(&input[i..i+2]).unwrap() += 1;
     }
 
-    return pairs;
+    pairs
 }
 
 fn to_counts(input: &str) -> HashMap<char, u64> {
@@ -129,13 +127,11 @@ fn to_counts(input: &str) -> HashMap<char, u64> {
 
     // Set initial counts of characters.
     for c in input.chars() {
-        if !counts.contains_key(&c) {
-            counts.insert(c, 0);
-        }
+        counts.entry(c).or_insert(0);
         *counts.get_mut(&c).unwrap() += 1;
     }
 
-    return counts;
+    counts
 }
 
 // Given a string and a set of insertion rules, return the string resulting
@@ -144,13 +140,11 @@ fn pair_insertion(pairs: HashMap<String, u64>, mut counts: HashMap<char, u64>, r
     let mut new_pairs = HashMap::new();
 
     for (pair, count) in pairs {
-        let left = pair.chars().nth(0).unwrap();
+        let left = pair.chars().next().unwrap();
         let right = pair.chars().nth(1).unwrap();
 
         let insert = *rules.get(&pair).unwrap();
-        if !counts.contains_key(&insert) {
-            counts.insert(insert, 0);
-        }
+        counts.entry(insert).or_insert(0);
 
         *counts.get_mut(&insert).unwrap() += count;
 
@@ -169,7 +163,7 @@ fn pair_insertion(pairs: HashMap<String, u64>, mut counts: HashMap<char, u64>, r
         *new_pairs.get_mut(&right_pair).unwrap() += count;
     }
 
-    return (new_pairs, counts);
+    (new_pairs, counts)
 }
 
 fn get_data(iter: &mut Iter<&str>) -> (String, HashMap<String, char>) {
@@ -179,10 +173,10 @@ fn get_data(iter: &mut Iter<&str>) -> (String, HashMap<String, char>) {
 
     let mut rules = HashMap::new();
 
-    while let Some(s) = iter.next() {
+    for s in iter {
         let mut split = s.split(" -> ");
         let pair = split.next().expect("error parsing pair!");
-        let insert = split.next().expect("error parsing insert char!").chars().nth(0).unwrap();
+        let insert = split.next().expect("error parsing insert char!").chars().next().unwrap();
 
         rules.insert(String::from(pair), insert);
     }
@@ -206,15 +200,15 @@ fn result_after_n(n: i64) -> u64 {
     let most = counts.values().max().unwrap();
     let least = counts.values().min().unwrap();
 
-    return most - least;
+    most - least
 }
 
 fn part1() -> u64 {
-    return result_after_n(10);
+    result_after_n(10)
 }
 
 fn part2() -> u64 {
-    return result_after_n(40);
+    result_after_n(40)
 }
 
 fn main() {

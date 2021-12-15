@@ -89,7 +89,7 @@ fn fold_along_x(grid: Grid, y: i64) -> Grid {
 
     let mut new_points = Vec::new();
     for p in points {
-        if p.y < y { new_points.push(p.clone()); }
+        if p.y < y { new_points.push(p); }
         else if p.y > y {
             // Calculate new y position of the point.
             let dist = (p.y - y).abs();
@@ -106,7 +106,7 @@ fn fold_along_y(grid: Grid, x: i64) -> Grid {
 
     let mut new_points = Vec::new();
     for p in points {
-        if p.x < x { new_points.push(p.clone()); }
+        if p.x < x { new_points.push(p); }
         else if p.x > x {
             // Calculate new y position of the point.
             let dist = (p.x - x).abs();
@@ -157,7 +157,7 @@ fn part2() -> u32 {
         println!();
     }
 
-    return grid.count(&|x| x == 1);
+    grid.count(&|x| x == 1)
 }
 
 fn main() {

@@ -101,7 +101,7 @@ fn path(p: Point, came_from: &HashMap<Point, Point>) -> Vec<Point> {
         path.push(current);
     }
 
-    path.iter().rev().map(|p| *p).collect()
+    path.iter().rev().copied().collect()
 }
 
 // Implementation of the A* search algorithm.
@@ -125,7 +125,7 @@ fn a_star(grid: &Grid, start: Point, end: Point) -> Vec<Point> {
     let mut f_score: HashMap<Point, i64> = HashMap::new();
     f_score.insert(start, start.manhattan(&end));
 
-    while open_set.len() > 0 {
+    while !open_set.is_empty() {
         // Inefficient, but good enough for now!
         open_set.sort_by_key(|p| Reverse(get_f_score(p, &f_score)));
 
@@ -170,11 +170,11 @@ fn part1() -> u64 {
         risk += grid.get(p);
     }
 
-    return risk as u64;
+    risk as u64
 }
 
 fn part2() -> u64 {
-    return 0;
+    0
 }
 
 fn main() {
