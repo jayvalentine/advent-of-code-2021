@@ -28,7 +28,7 @@ mod test_examples {
         let input = "38006F45291200";
 
         let packet = Packet::from_str(input).expect("parsing failed!");
-        assert_eq!(Packet::Operator(1, vec![Packet::Literal(6, 10), Packet::Literal(2, 20)]), packet);
+        assert_eq!(Packet::Operator(1, Operation::LessThan, vec![Packet::Literal(6, 10), Packet::Literal(2, 20)]), packet);
     }
 
     #[test]
@@ -64,10 +64,90 @@ mod test_examples {
     }
 }
 
+#[cfg(test)]
+mod test_examples_operators {
+    use super::*;
+
+    #[test]
+    fn value_1() {
+        let input = "C200B40A82";
+
+        let packet = Packet::from_str(input).expect("parsing failed!");
+        assert_eq!(3, value(&packet));
+    }
+
+    #[test]
+    fn value_2() {
+        let input = "04005AC33890";
+
+        let packet = Packet::from_str(input).expect("parsing failed!");
+        assert_eq!(54, value(&packet));
+    }
+
+    #[test]
+    fn value_3() {
+        let input = "880086C3E88112";
+
+        let packet = Packet::from_str(input).expect("parsing failed!");
+        assert_eq!(7, value(&packet));
+    }
+
+    #[test]
+    fn value_4() {
+        let input = "CE00C43D881120";
+
+        let packet = Packet::from_str(input).expect("parsing failed!");
+        assert_eq!(9, value(&packet));
+    }
+
+    #[test]
+    fn value_5() {
+        let input = "D8005AC2A8F0";
+
+        let packet = Packet::from_str(input).expect("parsing failed!");
+        assert_eq!(1, value(&packet));
+    }
+
+    #[test]
+    fn value_6() {
+        let input = "F600BC2D8F";
+
+        let packet = Packet::from_str(input).expect("parsing failed!");
+        assert_eq!(0, value(&packet));
+    }
+
+    #[test]
+    fn value_7() {
+        let input = "9C005AC2F8F0";
+
+        let packet = Packet::from_str(input).expect("parsing failed!");
+        assert_eq!(0, value(&packet));
+    }
+
+    #[test]
+    fn value_8() {
+        let input = "9C0141080250320F1802104A08";
+
+        let packet = Packet::from_str(input).expect("parsing failed!");
+        assert_eq!(1, value(&packet));
+    }
+}
+
+#[derive(PartialEq, Eq, Debug)]
+enum Operation {
+    Sum,
+    Product,
+    Minimum,
+    Maximum,
+    GreaterThan,
+    LessThan,
+    EqualTo
+}
+
 #[derive(PartialEq, Eq, Debug)]
 enum Packet {
     Literal(u64, u64),
-    Operator(u64, Vec<Packet>)
+    Operator(u64, Operation, Vec<Packet>)
 }
 
 #[derive(Debug)]
@@ -75,7 +155,8 @@ enum PacketParseError {
     InvalidLiteral,
     InvalidVersion,
     InvalidLengthId,
-    InvalidLengthField
+    InvalidLengthField,
+    InvalidOperation
 }
 
 fn to_hex(s: &str) -> String {
@@ -158,8 +239,18 @@ impl Packet {
                 }
             }
             
+            let op = match id {
+                0 => Operation::Sum,
+                1 => Operation::Product,
+                2 => Operation::Minimum,
+                3 => Operation::Maximum,
+                5 => Operation::GreaterThan,
+                6 => Operation::LessThan,
+                7 => Operation::EqualTo,
+                _ => return Err(PacketParseError::InvalidOperation)
+            };
 
-            Self::Operator(version, sub_packets)
+            Self::Operator(version, op, sub_packets)
         };
 
         Ok((packet, bits))
@@ -184,7 +275,7 @@ fn get_bits(s: &mut Chars, n: u64) -> Option<u64> {
 fn version_sum(p: &Packet) -> u64 {
     match p {
         Packet::Literal(v, _) => *v,
-        Packet::Operator(v, sub_packets) => {
+        Packet::Operator(v, _, sub_packets) => {
             let mut sum = *v;
 
             for sp in sub_packets {
@@ -192,6 +283,73 @@ fn version_sum(p: &Packet) -> u64 {
             }
 
             sum
+        }
+    }
+}
+
+fn value(p: &Packet) -> u64 {
+    match p {
+        Packet::Literal(_, val) => *val,
+        Packet::Operator(_, op, subpackets) => value_operator(op, subpackets)
+    }
+}
+
+fn value_operator(op: &Operation, packets: &Vec<Packet>) -> u64 {
+    match *op {
+        Operation::Sum => {
+            packets.iter().map(|p| value(p)).sum()
+        },
+        Operation::Product => {
+            let mut product = 1;
+            for v in packets.iter().map(|p| value(p)) {
+                product *= v;
+            }
+            product
+        }
+        Operation::Minimum => {
+            match packets.iter().map(|p| value(p)).min() {
+                Some(v) => v,
+                None => 0
+            }
+        },
+        Operation::Maximum => {
+            match packets.iter().map(|p| value(p)).max() {
+                Some(v) => v,
+                None => 0
+            }
+        },
+        Operation::GreaterThan => {
+            let lhs = &packets[0];
+            let rhs = &packets[1];
+
+            if value(lhs) > value(rhs) {
+                1
+            }
+            else {
+                0
+            }
+        },
+        Operation::LessThan => {
+            let lhs = &packets[0];
+            let rhs = &packets[1];
+
+            if value(lhs) < value(rhs) {
+                1
+            }
+            else {
+                0
+            }
+        },
+        Operation::EqualTo => {
+            let lhs = &packets[0];
+            let rhs = &packets[1];
+
+            if value(lhs) == value(rhs) {
+                1
+            }
+            else {
+                0
+            }
         }
     }
 }
