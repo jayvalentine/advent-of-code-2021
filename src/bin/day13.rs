@@ -144,22 +144,9 @@ fn part2() -> u32 {
     let max_x = points.iter().map(|p| p.x).max().unwrap();
     let max_y = points.iter().map(|p| p.y).max().unwrap();
 
-    for y in 0..(max_y+1) {
-        for x in 0..(max_x+1) {
-            let v = grid.get(&Point::new(x, y));
-            if v == 1 {
-                print!("#");
-            }
-            else {
-                print!(".");
-            }
-        }
-        println!();
-    }
-
     grid.count(&|x| x == 1)
 }
 
 fn main() {
-    aoc::solution!(13, "after first fold", "");
+    aoc::solution!(13, "after first fold", "after all folds");
 }
