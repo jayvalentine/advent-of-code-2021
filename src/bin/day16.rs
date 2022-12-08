@@ -361,9 +361,11 @@ fn part1() -> u64 {
 }
 
 fn part2() -> u64 {
-    return 0;
+    let packet: String = aoc::data::get::<String>("data/day16.txt")[0].clone();
+    let packet = Packet::from_str(&packet).expect("parsing packet failed!");
+    return value(&packet);
 }
 
 fn main() {
-    aoc::solution!(16, "", "");
+    aoc::solution!(16, "version sum", "value");
 }
